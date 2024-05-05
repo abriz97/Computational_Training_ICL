@@ -1,0 +1,115 @@
+---
+title: "Computational Training: Making R fast"
+author: "Andrea Brizzi"
+date: 2024-12-12
+# bibliography: references.bib
+execute:
+    echo: true
+    eval: false
+format:
+    revealjs:
+        title-slide-attributes:
+            data-background-image: "../figures/IMPERIAL_I_Maze_RGB.svg"
+            data-background-size: 15%
+            data-background-position: 50% 98%
+        embed-resources: true
+        default-fig-align: "center"
+        slide-number: true
+        theme: ["default"]
+        incremental: true
+        mermaid:
+            theme: "default" 
+        footer: "[Code and slides](https://www.github.com/abriz97/Computational_Training_ICL)"
+        # resources:
+        #   - "name.qmd"
+---
+
+
+## Great R resources
+
+In general: 
+
+1. [Advanced R](https://adv-r.hadley.nz/)
+2. [R for Data Science](https://r4ds.hadley.nz/)
+3. [RStudio Cheatsheets](https://www.rstudio.com/resources/cheatsheets/)
+4. [Useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+
+Covering this session's topics
+
+5. [data.table](https://rdatatable.gitlab.io/data.table/)
+6. [parallel](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package)
+
+
+## What is "fast code"?
+
+1. **Easy to write** \
+familiarity with code editor, libraries
+
+2. **Easy to understand** \
+structured, with consistent variable names, commented.
+
+3. **Easy to debug** \
+clear naming, DRY, tests.
+
+4. **Easy to run** \
+🏎️ (profiling, C++, using "optimized" code).
+
+
+##  Variable naming
+
+::: {.r-stack}
+![](../figures/MagrittePipe.jpg){.fragment height=250 fig-align="center"}
+
+![](../figures/catcat.png){.fragment height=250 fig-align="center"}
+:::
+
+. . .
+
+names should be consistent, descriptive, lower case, readable.
+
+```{r}
+# Which is better?
+tmp <-  10
+tmp1 <- tmp * 45
+
+cases_per_hour <- 10
+cases_per_day <- cases_per_hour * 24
+```
+
+::: footer
+[Dealing with the 2nd hardest thing in computer science (Patil)](https://indrajeetpatil.github.io/second-hardest-cs-thing/#/dealing-with-the-second-hardest-thing-in-computer-science)
+:::
+
+## Embrace functional programming
+
+"functions do actions"  - "avoid for loops"
+
+```{r}
+# Bad solution
+tmp1 <- "data/my_results_1.csv"
+tmp2 <- "data/my_results_2.csv"
+tmp3 <- "data/my_results_3.csv"
+tmp <- rbind(
+    readr::read_csv(file1),
+    readr::read_csv(file2),
+    readr::read_csv(file3)
+)
+# Better solution
+result_files <- list.files(
+    path = "data",
+    pattern = "my_results_*.csv",
+    full.path = TRUE)
+results <- lapply(results_files, readr::read_csv) %>% 
+    dplyr::bind_rows()
+```
+
+
+
+::: footer
+[Advanced R, Funtional Programming (Wickham)](https://adv-r.hadley.nz/fp.html)
+:::
+
+
+## Introduction to data.table
+
+## Parallelisation thorugh ...
