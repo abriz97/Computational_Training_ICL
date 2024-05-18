@@ -1,5 +1,6 @@
 ---
-title: "Computational Training: Making R fast"
+title: "Computational Training: running fastR"
+
 author: "Andrea Brizzi"
 date: 2024-12-12
 # bibliography: references.bib
@@ -12,17 +13,27 @@ format:
             data-background-image: "../figures/IMPERIAL_I_Maze_RGB.svg"
             data-background-size: 15%
             data-background-position: 50% 98%
+        preload-iframes: true
         embed-resources: true
         default-fig-align: "center"
         slide-number: true
         theme: ["default"]
+        highlight-style: "nord"
         incremental: true
         mermaid:
             theme: "default" 
         footer: "[Code and slides](https://www.github.com/abriz97/Computational_Training_ICL)"
+        preview-links: true
+        monofont: 'Source Code Pro'
+        monofontoptions: 
+            - Scale=0.8
+        # code-block-bg: true
+        code-line-numbers: false
+        # code-block-border-left: "#31BAE9"
         # resources:
         #   - "name.qmd"
 ---
+
 
 
 ## Great R resources
@@ -67,49 +78,279 @@ clear naming, DRY, tests.
 
 names should be consistent, descriptive, lower case, readable.
 
-```{r}
-# Which is better?
-tmp <-  10
-tmp1 <- tmp * 45
+. . .
 
+For which snippet is it easier to guess the context? 
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+tmp <-  10
+tmp1 <- tmp * 24
+```
+
+:::
+
+::: {.column width="50%"}
+```{r}
 cases_per_hour <- 10
 cases_per_day <- cases_per_hour * 24
 ```
+:::
+
+:::
+
 
 ::: footer
 [Dealing with the 2nd hardest thing in computer science (Patil)](https://indrajeetpatil.github.io/second-hardest-cs-thing/#/dealing-with-the-second-hardest-thing-in-computer-science)
 :::
 
-## Embrace functional programming
+## Embrace functional programming I
 
-"functions do actions"  - "avoid for loops"
+*Functions are first-class citizens in R*
 
-```{r}
-# Bad solution
-tmp1 <- "data/my_results_1.csv"
-tmp2 <- "data/my_results_2.csv"
-tmp3 <- "data/my_results_3.csv"
-tmp <- rbind(
-    readr::read_csv(file1),
-    readr::read_csv(file2),
-    readr::read_csv(file3)
-)
-# Better solution
-result_files <- list.files(
-    path = "data",
-    pattern = "my_results_*.csv",
-    full.path = TRUE)
-results <- lapply(results_files, readr::read_csv) %>% 
-    dplyr::bind_rows()
+::: {.columns}
+
+::: {.column width="57%"}
+
+* can be passed as arguments
+* can be returned from other functions
+* can be assigned to variables
+* and more...
+
+:::
+
+::: {.column width="41%"}
+
+```{r functional-programming-i }
+#| filename: "first-class-citizenship.R"
+#| warning: false
+
+f <- function(x){x^2}
+
+lapply(1:10, f)
+
+generator <- function(n=2){
+    function(x){x^n}
+}
+cube <- generator(3)
+
+list(one_function = f)
 ```
 
+:::
 
-
-::: footer
-[Advanced R, Funtional Programming (Wickham)](https://adv-r.hadley.nz/fp.html)
 :::
 
 
-## Introduction to data.table
+## Embrace functional programming II
 
-## Parallelisation thorugh ...
+*Rethink for,while loops; "apply" instead*
+
+. . .
+
+> “To become significantly more reliable, code must become more transparent. In particular, nested conditions and loops must be viewed with great suspicion. Complicated control flows confuse programmers. Messy code often hides bugs.”
+>
+> — Bjarne Stroustrup
+
+
+::: footer
+[Advanced R, Funtional Programming (Wickham)](https://adv-r.hadley.nz/functionals.html)
+:::
+
+
+. . .
+
+<div style="text-align: right;">**...but why?**</div>
+
+## 
+
+Say you want to extract the $R^2$ from three linear models with different predictors (or formulae).
+
+```{r }
+#| filename: "formulae.R"
+#| warning: false
+formulae <- c(
+    Sepal.Length ~ Sepal.Width,
+    Sepal.Length ~ Petal.Length,
+    Sepal.Length ~ Species
+)
+```
+
+. . .
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r for-loop}
+#| filename: "bad way"
+#| warning: false
+lm_results2 <- c()
+
+for (formula in formulae) {
+    fit <- lm(formula, data = iris)
+    r2 <- summary(fit)$r.squared
+    lm_results2 <- c(lm_results2, r2)
+}
+```
+:::
+
+::: {.column width="50%"}
+```{r }
+#| filename: "good way"
+#| warning: false
+extract_r2 <- function(formula) {
+    fit <- lm(formula, data = iris)
+    r2 <- summary(fit)$r.squared
+    return(r2)
+}
+
+lm_results <- sapply(formulae, extract_r2)
+```
+:::
+
+
+:::
+
+<div style="text-align: center;">What's the difference?</div>
+
+. . .
+
+```{r}
+#| filename: "side effects"
+#| warning: false
+exists("fit")
+```
+
+::: footer
+[Advanced R, Functional Programming (Wickham)](https://adv-r.hadley.nz/fp.html)
+:::
+
+::: { .notes }
+- For loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other.
+:::
+
+## The `parallel` package
+
+You can imagine wanting to run each of the apply/for loop iterations in `parallel`.
+
+::: { .notes }
+especially if iterations are independent and computationally expensive.
+Two quick sentences on the two different approaches.
+:::
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r socket}
+#| filename: "sockets (not on Windows)"
+#| warning: false
+
+library(parallel)
+f <- function(i) {
+    lme4::lmer(
+        Petal.Width ~ . - Species + (1 | Species),
+        data = iris)
+}
+
+system.time(save1 <- lapply(1:100, f))
+##    user  system elapsed
+##   2.048   0.019   2.084
+system.time(save2 <- mclapply(1:100, f))
+##    user  system elapsed
+##   1.295   0.150   1.471
+```
+:::
+
+::: {.column width="50%"}
+```{r }
+#| filename: "forking"
+#| warning: false
+
+num_cores <- detectCores()
+cl <- makeCluster(num_cores)
+system.time(save3 <- parLapply(cl, 1:100, f))
+#    user  system elapsed 
+#   0.198   0.044   1.032 
+stopCluster(cl)
+```
+
+* requires further attention
+
+:::
+
+:::
+
+
+::: footer
+[Parallel computing in R](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package)
+:::
+
+
+## Introduction to [data.table](https://rdatatable.gitlab.io/data.table/)
+
+* `data.table` is a package that extends the data.frame class.
+* (Quicker) alternative to `dplyr` for large datasets.
+* [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf)
+
+## all you need to know
+
+### `dt[`<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>`]`
+
+* use the data.table called `dt` ...
+* subset it on the rows specified <span style="color:blue;">i</span>...
+* and manipulate columns with <span style="color:red;">j</span>...
+* grouped according to <span style="color:green;">by</span>.
+
+## Basic Examples with `iris`
+
+#### Example 1: Subsetting and Summarizing
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+* explanation here.
+:::
+
+::: {.column width="50%"}
+```{r}
+library(data.table)
+dt <- as.data.table(iris)
+dt[Species == "setosa", mean(Sepal.Length)]
+```
+:::
+
+:::
+
+#### Example 2: Grouping and Aggregating
+
+::: {.columns}
+
+::: {.column width="50%"}
+* explanation here.
+:::
+
+::: {.column width="50%"}
+```{r}
+library(data.table)
+dt <- as.data.table(iris)
+dt[Species == "setosa", mean(Sepal.Length)]
+```
+:::
+
+:::
+
+
+
+. . . 
+
+::: { .notes }
+ {background-iframe="hello-matrix/index.html"}
+let us add this with the hex of data.table at the end.
+:::
+
+
+
