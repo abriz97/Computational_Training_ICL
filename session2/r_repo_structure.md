@@ -15,6 +15,13 @@ Notes from [blog](r-bloggers.com/2018/08/structuring-r-projects) adapted with my
     └── .gitignore
 ```
 
+
+
+The `template.zip` file contains a template for this specific R structure.
+You can `unzip template.zip`  to create a new project directory [^1]
+
+[^1]: (The idea was to provide a template to R's version of cookiecutter, but I wasn't successful in making it work propertly)
+
 More of a general guideline rather than a strict rule to adhere to.
 However, if you know you want to make a R package, you may want to refer to [R package book](http://r-pkgs.had.co.nz/).
 
