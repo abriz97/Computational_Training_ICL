@@ -1,4 +1,4 @@
-# Computation_Training_ICL
+# :rocket: Computation_Training_ICL :rocket:
 Materials for the "Computation Training" sessions for the Msc Statistics program at ICL.
 
 ## Structure 
