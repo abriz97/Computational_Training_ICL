@@ -15,7 +15,7 @@ The topics are structured as follows:
 | [Session 2](./session2/) | May 28, 14:00 to 17:00 | Conda                                                            |
 |                          |                        | [Overleaf](./session2/Overleaf_notes.pdf)                        |
 |                          |                        | Reproducibility                                                  |
-|                          |                        | Code Optimisation and profiling for [R](making_R_fast.qmd) and [python]()         |
+|                          |                        | Code Optimisation and profiling for [R](./making_R_fast.qmd) and [python]()         |
 |                          |                        | Package Suggestions & useful resources                           |
 
 
