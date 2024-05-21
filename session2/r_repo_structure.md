@@ -1,13 +1,15 @@
-# Structuring your R directory
+# :ok_hand: Structuring your R directory[^1]
 
-## A typical directory
+[^1]: (A `*.md` file without emoji IS NOT a `*.md` file)
+
+## :pushpin: A typical directory
 
 Inspired from [this blog]([r-bloggers.com/2018/08/structuring-r-projects](https://www.r-bloggers.com/2018/08/structuring-r-projects/)) adapted with my own experience.
 
 This document is more of a general guideline rather than a strict rule to adhere to.
 
-A typical structure, which you can recreate by unzipping the [`template.zip`](./template.zip) file a desired location[^1], is presented below:
-[^1]: (The idea was to provide a template to R's version of `cookiecutter`, but I wasn't successful in making it work properly)
+A typical structure, which you can recreate by unzipping the [`template.zip`](./template.zip) file a desired location[^2], is presented below:
+[^2]: (The idea was to provide a template to R's version of `cookiecutter`, but I wasn't successful in making it work properly)
 
 ```
 .
@@ -48,7 +50,7 @@ You will likely want to save outputs to a specific folder. It makes sense to fur
 - `run_analyses.R`
     - this is the script you run to generate the results of your project.
 
-## Example
+## :file_folder: Example [^1]
 
 This is an example from one of my projects:
 
@@ -81,7 +83,7 @@ This is an example from one of my projects:
     └── ...
 ```
 
-## Advanced Topics
+## :fire: Advanced Topics
 
 * If you plan to package your `R` code, you may want to refer to [R package book](http://r-pkgs.had.co.nz/).
 * If you really care about reproducibility, conside [orderly](https://cran.r-project.org/web/packages/orderly/vignettes/orderly.html)
