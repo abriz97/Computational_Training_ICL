@@ -20,7 +20,7 @@ Notes from [blog]([r-bloggers.com/2018/08/structuring-r-projects](https://www.r-
 The `template.zip` file contains a template for this specific R structure.
 You can `unzip template.zip`  to create a new project directory [^1]
 
-[^1]: (The idea was to provide a template to R's version of cookiecutter, but I wasn't successful in making it work propertly)
+[^1]: (The idea was to provide a template to R's version of `cookiecutter`, but I wasn't successful in making it work property)
 
 More of a general guideline rather than a strict rule to adhere to.
 However, if you know you want to make a R package, you may want to refer to [R package book](http://r-pkgs.had.co.nz/).
@@ -34,18 +34,18 @@ However, if you know you want to make a R package, you may want to refer to [R p
 
 Common to  "keep function definition and application separate".
 
-- `R`
+- `R` (_definition_ folder)
     - this is where you store your function definitions.
     - sourcing these files will exclusively load the functions into the global environment.
-- `src` (application repository)
-    - this is where you store your scripts which aim to do generate something
-    That is, files where functions are defined are not the same as files where functions are applied.
+- `src` (_application_ folder)
+    - this is where you store your scripts which aim to generate something
+    That is, files where functions are defined are not those in which functions are applied.
 
 - `output`
     - typically with subfolders such as `figures`, `tables`, `reports`, etc.
 
 - `run_analyses.R`
-    - this is the script that you run to generate the results of your project.
+    - this is the script you run to generate the results of your project.
 
 
 This is an example from one of my projects:
