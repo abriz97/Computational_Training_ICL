@@ -300,44 +300,73 @@ stopCluster(cl)
 ### `dt[`<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>`]`
 
 * use the data.table called `dt` ...
-* subset it on the rows specified <span style="color:blue;">i</span>...
+* subset it on the rows specified by <span style="color:blue;">i</span>...
 * and manipulate columns with <span style="color:red;">j</span>...
 * grouped according to <span style="color:green;">by</span>.
 
+```{r}
+#| eval: true
+library(data.table)
+iris_dt <- as.data.table(iris)
+```
+
 ## Basic Examples with `iris`
 
-#### Example 1: Subsetting and Summarizing
+#### Eg 1: Subsetting and Summarizing
 
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-* explanation here.
+* Say we want to  calculate <span style="color:red;">the mean sepal length</span> for the <span style="color:blue;">setosa species</span>...
 :::
 
 ::: {.column width="50%"}
 ```{r}
-library(data.table)
-dt <- as.data.table(iris)
-dt[Species == "setosa", mean(Sepal.Length)]
+#| eval: true
+iris_dt[Species == "setosa", mean(Sepal.Length)]
 ```
 :::
 
-:::
+::: 
 
-#### Example 2: Grouping and Aggregating
+
+
+#### Eg 2: Grouping and Aggregating
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-* explanation here.
+* Now we want to  <span style="color:red;">repeat the above</span> for <span style="color:green;">every species</span>, in one command.
 :::
+
 
 ::: {.column width="50%"}
 ```{r}
-library(data.table)
-dt <- as.data.table(iris)
-dt[Species == "setosa", mean(Sepal.Length)]
+#| eval: true
+iris_dt[, mean(Sepal.Length), by=Species]
+```
+:::
+
+:::
+
+
+## Basic Examples with `iris`: `.VARS`
+
+#### Eg 3: Counting entries
+
+::: {.columns}
+
+::: {.column width="50%"}
+* Count the total <span style="color:red;"> number of observations </span> per <span style="color:green;"> species </span>,  with <span style="color:blue;">sepal length larger than 5</span>.
+:::
+
+
+::: {.column width="50%"}
+```{r}
+#| eval: true
+# length(Sepal.Length) could have also been used
+iris_dt[Sepal.Length, .N, by=species]
 ```
 :::
 
@@ -345,7 +374,6 @@ dt[Species == "setosa", mean(Sepal.Length)]
 
 
 
-. . . 
 
 ::: { .notes }
  {background-iframe="hello-matrix/index.html"}
