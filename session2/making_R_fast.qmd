@@ -348,10 +348,13 @@ dt[Species == "setosa", mean(Sepal.Length)]
 * Identify (and hopefully fix!) bottlenecks in your code.
 * The [`profvis`](https://rstudio.github.io/profvis/) package is a good package to use for this purpose.
 
-## Profiling Example
+![](../figures/profiling.webp){.fragment height=350 fig-align="center"}
+
+## Profiling Example: Column Means
 
 ```{r prof}
 #| eval: true
+#| output-location: slide
 library(profvis)
 library(data.table)
 n <- 4e5
@@ -370,6 +373,9 @@ profvis({
   means <- dataDF[, lapply(.SD, mean), .SDcols = numeric_vars]
 })
 ```
+## Profiling
+
+
 
 . . . 
 
