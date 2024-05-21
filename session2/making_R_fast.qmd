@@ -8,10 +8,10 @@ format: revealjs
 ::: {.nonincremental}
 In general: 
 
-1. [Advanced R](https://adv-r.hadley.nz/)
-2. [R for Data Science](https://r4ds.hadley.nz/)
-3. [RStudio Cheatsheets](https://www.rstudio.com/resources/cheatsheets/)
-4. [Useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
+1.  [Advanced R](https://adv-r.hadley.nz/)
+2.  [R for Data Science](https://r4ds.hadley.nz/)
+3.  [RStudio Cheatsheets](https://www.rstudio.com/resources/cheatsheets/)
+4.  [Useful R packages](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages)
 
 Covering this session's topics
 
@@ -34,13 +34,12 @@ clear naming, DRY, tests.
 4. 🏎️ **Easy to run** \
  (profiling, C++, using "optimized" code).
 
+## Variable naming
 
-##  Variable naming
+::: r-stack
+![](../figures/MagrittePipe.jpg){.fragment height="250" fig-align="center"}
 
-::: {.r-stack}
-![](../figures/MagrittePipe.jpg){.fragment height=250 fig-align="center"}
-
-![](../figures/catcat.png){.fragment height=250 fig-align="center"}
+![](../figures/catcat.png){.fragment height="250" fig-align="center"}
 :::
 
 . . .
@@ -49,17 +48,14 @@ names should be consistent, descriptive, lower case, readable.
 
 . . .
 
-For which snippet is it easier to guess the context? 
+For which snippet is it easier to guess the context?
 
-::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 tmp <-  10
 tmp1 <- tmp * 24
 ```
-
 :::
 
 ::: {.column width="50%"}
@@ -68,9 +64,7 @@ cases_per_hour <- 10
 cases_per_day <- cases_per_hour * 24
 ```
 :::
-
 :::
-
 
 ::: footer
 [Dealing with the 2nd hardest thing in computer science (Patil)](https://indrajeetpatil.github.io/second-hardest-cs-thing/#/dealing-with-the-second-hardest-thing-in-computer-science)
@@ -80,15 +74,12 @@ cases_per_day <- cases_per_hour * 24
 
 *Functions are first-class citizens in R*
 
-::: {.columns}
-
+::: columns
 ::: {.column width="57%"}
-
-* can be passed as arguments
-* can be returned from other functions
-* can be assigned to variables
-* and more...
-
+-   can be passed as arguments
+-   can be returned from other functions
+-   can be assigned to variables
+-   and more...
 :::
 
 ::: {.column width="41%" .fragment}
@@ -108,11 +99,8 @@ cube <- generator(3)
 
 list(one_function = f)
 ```
-
 :::
-
 :::
-
 
 ## Embrace functional programming II
 
@@ -120,19 +108,19 @@ list(one_function = f)
 
 . . .
 
-> “To become significantly more reliable, code must become more transparent. In particular, nested conditions and loops must be viewed with great suspicion. Complicated control flows confuse programmers. Messy code often hides bugs.”
+> "To become significantly more reliable, code must become more transparent. In particular, nested conditions and loops must be viewed with great suspicion. Complicated control flows confuse programmers. Messy code often hides bugs."
 >
-> — Bjarne Stroustrup
-
+> --- Bjarne Stroustrup
 
 ::: footer
 [Advanced R, Funtional Programming (Wickham)](https://adv-r.hadley.nz/functionals.html)
 :::
 
-
 . . .
 
-<div style="text-align: right;">**...but why?**</div>
+::: {style="text-align: right;"}
+**...but why?**
+:::
 
 ## 
 
@@ -179,8 +167,6 @@ extract_r2 <- function(formula) {
 lm_results <- sapply(formulae, extract_r2)
 ```
 :::
-
-
 :::
 
 . . .
@@ -199,17 +185,16 @@ exists("fit")
 [Advanced R, Functional Programming (Wickham)](https://adv-r.hadley.nz/fp.html)
 :::
 
-::: { .notes }
-- For loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other.
+::: notes
+-   For loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other.
 :::
 
 ## The `parallel` package
 
 You can imagine wanting to run each of the apply/for loop iterations in `parallel`.
 
-::: { .notes }
-especially if iterations are independent and computationally expensive.
-Two quick sentences on the two different approaches.
+::: notes
+especially if iterations are independent and computationally expensive. Two quick sentences on the two different approaches.
 :::
 
 ::: {.columns}
@@ -248,23 +233,19 @@ system.time(save3 <- parLapply(cl, 1:100, f))
 stopCluster(cl)
 ```
 
-* requires further attention
-
+-   requires further attention
 :::
-
 :::
-
 
 ::: footer
 [Parallel computing in R](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package)
 :::
 
-
 ## Introduction to [data.table](https://rdatatable.gitlab.io/data.table/)
 
-* `data.table` is a package that extends the data.frame class.
-* (Quicker) alternative to `dplyr` for large datasets.
-* [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf)
+-   `data.table` is a package that extends the data.frame class.
+-   (Quicker) alternative to `dplyr` for large datasets.
+-   [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf)
 
 ## all you need to know
 
@@ -325,7 +306,6 @@ iris_dt[Species == "setosa", mean(Sepal.Length)]
 iris_dt[, mean(Sepal.Length), by=Species]
 ```
 :::
-
 :::
 
 
@@ -505,10 +485,10 @@ Advanced topics:
 
 ## Profiling
 
-* Identify (and hopefully fix!) bottlenecks in your code.
-* The [`profvis`](https://rstudio.github.io/profvis/) package is a good package to use for this purpose.
+-   Identify (and hopefully fix!) bottlenecks in your code.
+-   The [`profvis`](https://rstudio.github.io/profvis/) package is a good package to use for this purpose.
 
-![](../figures/profiling.webp){.fragment height=350 fig-align="center"}
+![](../figures/profiling.webp){.fragment height="350" fig-align="center"}
 
 ## Profiling Example: Column Means
 
@@ -534,15 +514,148 @@ profvis({
 })
 ```
 
-## Profiling
+## Good coding practice: Reproducibility & Generalisability
 
+Why are code reproducibility & generalisability important?
 
+-   Transparency & Verification
+-   Collaboration & Longevity
+-   Quicker detection of errors
 
+## Reproducibility
 
-::: { .notes }
- {background-iframe="hello-matrix/index.html"}
-let us add this with the hex of data.table at the end.
+-   Main idea: Be able to reproduce results to ensure they are valid.
+-   Common practices:
+    -   Setting the seed
+    -   Importing all necessary packages
+    -   Documenting R environment ([`sessionInfo()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/sessionInfo))
+
+::: columns
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "bad way"
+#| error: false
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
 :::
 
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "still bad..."
+#| error: false
+set.seed(1234)
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
+:::
 
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "there we go!"
+library(truncnorm)
+set.seed(1234)
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
+:::
+:::
 
+## Generalisability
+
+-   Code should be "generalisable" meaning that anyone else can refer to it and use it on their own data.
+-   Common practices:
+    -   Write functions for operations you use frequently ⚙️
+    -   Document your code (add comments) 💬
+    -   Add basic checks (testing) ❓
+    -   Test your code on different data sets ✔️❌
+    
+## Generalisability: Example
+
+Task: Create a function that takes as input any data set and performs K-Means clustering (use function `kmeans`) of the observations using the reciprocals of variables (i.e. instead of using `x`, use `1/x`). Return the cluster assignment for the first 20 elements. This function will be used on the `iris` data set (with K=3 clusters). 
+
+:::{.fragment}
+```{r badex_gen}
+#| filename: "don't even bother..."
+#| eval: true
+#| error: false
+kmeans_recip <- function(){
+  for (i in c(1:4)){
+    iris[, i] <- 1/iris[, i]
+  }
+  kmeans_res <- kmeans(iris[, c(1:4)], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip()[1:20]
+```
+:::
+
+## Generalisability: Example
+* The previous example works but it's really not generalisable...
+* Obvious things that need improvement:
+  + Hardcoded values (first 4 columns are numeric in `iris`)
+  + Data set should be an input argument
+
+:::{.fragment}
+```{r okex_gen}
+#| filename: "it's getting better"
+#| eval: true
+#| error: false
+kmeans_recip <- function(data, cont_cols){
+  for (i in cont_cols){
+    data[, i] <- 1/data[, i]
+  }
+  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip(data = iris, cont_cols = c(1:4))[1:20]
+```
+:::
+
+## Generalisability: Example {.smaller}
+* We can still do better! More things to consider:
+  + Division by 0 is not allowed
+  + Determine numerical variables automatically
+  + Ensure there exists at least one continuous variable
+  + Add some comments
+
+:::{.fragment}
+```{r goodex_gen}
+#| filename: "that's looking good"
+#| eval: true
+#| error: false
+kmeans_recip <- function(data){
+  # Obtain numerical variables
+  cont_cols <- which(sapply(data, is.numeric))
+  # Check there is at least 1 numerical variable
+  if (length(cont_cols)==0) stop('No numerical variables!')
+  for (i in cont_cols){
+    # Check if numerical variable takes 0 value
+    ifelse(any(data[, i] == 0),
+           stop('Division by 0 not allowed!'),
+           data[, i] <- 1/data[, i])
+  }
+  # Apply K-Means clustering
+  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip(data = iris)[1:20]
+```
+:::
+
+## Generalisability: Example
+* Now we can also check if this works on the `diamonds` data set from the `ggplot2` package.
+
+:::{.fragment}
+```{r diamonds}
+#| filename: "seems like it works!"
+#| eval: true
+#| error: true
+library(ggplot2)
+kmeans_recip(data = diamonds)[1:20]
+```
+:::
+
+::: notes
+{background-iframe="hello-matrix/index.html"} let us add this with the hex of data.table at the end.
+:::
