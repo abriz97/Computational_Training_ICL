@@ -1,5 +1,5 @@
 
-Notes from [blog](r-bloggers.com/2018/08/structuring-r-projects) adapted with my own experience.
+Notes from [blog]([r-bloggers.com/2018/08/structuring-r-projects](https://www.r-bloggers.com/2018/08/structuring-r-projects/)) adapted with my own experience.
 
 ```
 .
