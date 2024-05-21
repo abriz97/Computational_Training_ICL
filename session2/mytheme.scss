@@ -1,0 +1,16 @@
+/*-- scss:defaults --*/
+// write shortcuts for divs with green, red and blue text color?
+
+/*-- scss:rules --*/
+
+.reveal div .top-right {
+    p {
+        margin: 0;
+    }
+    margin: 0;
+    position: absolute;
+    top: -4px;
+    right: -12px;
+    text-align: right;
+    font-size: 20px;
+}

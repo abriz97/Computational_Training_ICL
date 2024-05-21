@@ -1,0 +1,33 @@
+project:
+  type: website
+
+title: "Computational Training: running fastR"
+author: "Andrea Brizzi and Efhtymios Costa"
+date: 2024-05-28
+
+format:
+  revealjs:
+    title-slide-attributes:
+      data-background-image: "../figures/IMPERIAL_I_Maze_RGB.svg"
+      data-background-size: 15%
+      data-background-position: 50% 98%
+    preload-iframes: true
+    embed-resources: true
+    default-fig-align: "center"
+    slide-number: true
+    theme: [ "default", "mytheme.scss" ]
+    theme-dark: [ "default", "mytheme.scss" ]
+    highlight-style:  "github"
+    incremental: true
+    mermaid:
+        theme: "default" 
+    footer: "[Code and slides](https://www.github.com/abriz97/Computational_Training_ICL)"
+    preview-links: true
+    monofont: 'Source Code Pro'
+    monofontoptions: 
+        - Scale=0.8
+    code-line-numbers: false
+
+execute:
+    echo: true
+    eval: false

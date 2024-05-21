@@ -1,43 +1,11 @@
 ---
 title: "Computational Training: running fastR"
-
-author: "Andrea Brizzi"
-date: 2024-12-12
-# bibliography: references.bib
-execute:
-    echo: true
-    eval: false
-format:
-    revealjs:
-        title-slide-attributes:
-            data-background-image: "../figures/IMPERIAL_I_Maze_RGB.svg"
-            data-background-size: 15%
-            data-background-position: 50% 98%
-        preload-iframes: true
-        embed-resources: true
-        default-fig-align: "center"
-        slide-number: true
-        theme: ["default"]
-        highlight-style: "nord"
-        incremental: true
-        mermaid:
-            theme: "default" 
-        footer: "[Code and slides](https://www.github.com/abriz97/Computational_Training_ICL)"
-        preview-links: true
-        monofont: 'Source Code Pro'
-        monofontoptions: 
-            - Scale=0.8
-        # code-block-bg: true
-        code-line-numbers: false
-        # code-block-border-left: "#31BAE9"
-        # resources:
-        #   - "name.qmd"
+format: revealjs
 ---
 
+## Great R resources 
 
-
-## Great R resources
-
+::: {.nonincremental}
 In general: 
 
 1. [Advanced R](https://adv-r.hadley.nz/)
@@ -49,21 +17,22 @@ Covering this session's topics
 
 5. [data.table](https://rdatatable.gitlab.io/data.table/)
 6. [parallel](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package)
+:::
 
 
 ## What is "fast code"?
 
-1. **Easy to write** \
+1.  ✏️ **Easy to write** \
 familiarity with code editor, libraries
 
-2. **Easy to understand** \
+2. 💡 **Easy to understand** \
 structured, with consistent variable names, commented.
 
-3. **Easy to debug** \
+3. 🔧 **Easy to debug** \
 clear naming, DRY, tests.
 
-4. **Easy to run** \
-🏎️ (profiling, C++, using "optimized" code).
+4. 🏎️ **Easy to run** \
+ (profiling, C++, using "optimized" code).
 
 
 ##  Variable naming
@@ -122,7 +91,7 @@ cases_per_day <- cases_per_hour * 24
 
 :::
 
-::: {.column width="41%"}
+::: {.column width="41%" .fragment}
 
 ```{r functional-programming-i }
 #| filename: "first-class-citizenship.R"
@@ -147,7 +116,7 @@ list(one_function = f)
 
 ## Embrace functional programming II
 
-*Rethink for,while loops; "apply" instead*
+*Rethink for, while loops; "apply" instead*
 
 . . .
 
@@ -183,7 +152,7 @@ formulae <- c(
 
 ::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r for-loop}
 #| filename: "bad way"
 #| warning: false
@@ -197,7 +166,7 @@ for (formula in formulae) {
 ```
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r }
 #| filename: "good way"
 #| warning: false
@@ -213,6 +182,8 @@ lm_results <- sapply(formulae, extract_r2)
 
 
 :::
+
+. . .
 
 <div style="text-align: center;">What's the difference?</div>
 
@@ -243,7 +214,7 @@ Two quick sentences on the two different approaches.
 
 ::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r socket}
 #| filename: "sockets (not on Windows)"
 #| warning: false
@@ -264,7 +235,7 @@ system.time(save2 <- mclapply(1:100, f))
 ```
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r }
 #| filename: "forking"
 #| warning: false
@@ -297,12 +268,14 @@ stopCluster(cl)
 
 ## all you need to know
 
-### `dt[`<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>`]`
+<div style="text-align: center; font-size: 100px;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
 
 * use the data.table called `dt` ...
 * subset it on the rows specified by <span style="color:blue;">i</span>...
 * and manipulate columns with <span style="color:red;">j</span>...
 * grouped according to <span style="color:green;">by</span>.
+
+. . .
 
 ```{r}
 #| eval: true
@@ -310,18 +283,21 @@ library(data.table)
 iris_dt <- as.data.table(iris)
 ```
 
-## Basic Examples with `iris`
+## `iris` summaries
 
-#### Eg 1: Subsetting and Summarizing
+#### Subsetting and Summarizing
 
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
 
 ::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 * Say we want to  calculate <span style="color:red;">the mean sepal length</span> for the <span style="color:blue;">setosa species</span>...
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r}
 #| eval: true
 iris_dt[Species == "setosa", mean(Sepal.Length)]
@@ -330,18 +306,20 @@ iris_dt[Species == "setosa", mean(Sepal.Length)]
 
 ::: 
 
+#### Grouping and Aggregating
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
 
-
-#### Eg 2: Grouping and Aggregating
 
 ::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 * Now we want to  <span style="color:red;">repeat the above</span> for <span style="color:green;">every species</span>, in one command.
 :::
 
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r}
 #| eval: true
 iris_dt[, mean(Sepal.Length), by=Species]
@@ -351,26 +329,179 @@ iris_dt[, mean(Sepal.Length), by=Species]
 :::
 
 
-## Basic Examples with `iris`: `.VARS`
+## `iris` summaries (`.VARS`)
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
 
-#### Eg 3: Counting entries
+
+#### Counting entries (`.N`)
 
 ::: {.columns}
 
-::: {.column width="50%"}
-* Count the total <span style="color:red;"> number of observations </span> per <span style="color:green;"> species </span>,  with <span style="color:blue;">sepal length larger than 5</span>.
+::: {.column width="50%" .fragment}
+* Count the total <span style="color:red;"> number of observations </span> per <span style="color:green;"> species </span>,  with <span style="color:blue;">sepal length > 5</span>.
 :::
 
 
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 ```{r}
 #| eval: true
-# length(Sepal.Length) could have also been used
-iris_dt[Sepal.Length, .N, by=species]
+iris_dt[Sepal.Length>5, .N, by=Species]
 ```
 :::
 
 :::
+
+#### Print 1st entry of each group (`.SD`)
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
+
+
+::: {.columns}
+
+::: {.column width="50%" .fragment}
+* Print the <span style="color:red;">first entry</span> of each  <span style="color:green;"> group (species) </span>.
+:::
+
+::: {.column width="50%" .fragment}
+
+```{r}
+#| eval: true
+iris_dt[, .SD[1], by=Species]
+```
+:::
+
+
+::: footer
+`?.I` for documentation on data.table's special symbols.
+:::
+
+:::
+
+
+## Modifying the `dt` (in place)
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
+
+
+#### Define a new column
+
+::: {.columns}
+
+::: {.column width="50%" .fragment}
+* Say you want species names to sound more Italian.
+:::
+
+::: {.column width="50%" .fragment}
+
+```{r}
+#| eval: true
+iris_dt[, Species_ita := paste0(
+    Species, 'ino'
+), by=Species]
+iris_dt[, unique(Species_ita)]
+```
+:::
+
+:::
+
+
+#### Modify existing column
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
+
+
+::: {.columns}
+
+::: {.column width="50%" .fragment}
+* The "aino" ending does not sound right, let's remove the "a".
+:::
+
+::: {.column width="50%" .fragment}
+```{r}
+#| eval: true
+iris_dt[, Species_ita := gsub(
+    "aino","ino",
+    Species_ita
+), by=Species_ita]
+iris_dt[, unique(Species_ita)]
+```
+:::
+
+:::
+
+## Acting on multiple columns
+::: {.top-right}
+<div style="text-align: center;">dt[<span style="color:blue;">i</span>, <span style="color:red;">j</span>, <span style="color:green;">by</span>]</div>
+::: 
+
+
+#### Apply a function to multiple columns
+
+::: {.columns}
+
+::: {.column width="40%" .fragment}
+* Let us round the numeric columns to integers...
+:::
+
+::: {.column width="60%" .fragment}
+```{r }
+#| eval:  true
+#| warning: false
+numeric_cols <- names(iris_dt)[sapply(iris_dt, is.numeric)]
+iris_dt[, lapply(
+    .SD, as.integer
+), .SDcols = numeric_cols] |> head(2)
+```
+:::
+
+:::
+
+
+#### Define multiple columns at once
+
+::: {.columns}
+
+::: {.column width="40%" .fragment}
+* ... and store them in columns with the same name, but with a `_int` suffix.
+:::
+
+::: {.column width="60%" .fragment}
+```{r }
+#| eval: true
+#| warning: false
+new_cols <- paste0(numeric_cols, "_int")
+iris_dt[, (new_cols) := lapply(
+    .SD, as.integer
+), .SDcols = numeric_cols]; head(iris_dt, n=2)
+```
+:::
+
+
+:::
+
+## Summary and advanced topics
+
+::: {.nonincremental}
+* `data.table` is a powerful package for data manipulation.
+* quick to write and quick to run BUT not the easiest to read.
+
+Advanced topics:
+
+* Definitely print out a [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf) if you want to start using it.
+* [data.table function reference](https://rdatatable.gitlab.io/data.table/reference/index.html) for additional wrangling utilities.
+* [Vignettes](https://rdatatable.gitlab.io/data.table/articles/datatable-intro.html) for more advanced topics.
+:::
+
+::: {footer}
+
+:::
+
+
 
 ## Profiling
 
@@ -402,6 +533,7 @@ profvis({
   means <- dataDF[, lapply(.SD, mean), .SDcols = numeric_vars]
 })
 ```
+
 ## Profiling
 
 
