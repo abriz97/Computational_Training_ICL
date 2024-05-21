@@ -343,7 +343,33 @@ dt[Species == "setosa", mean(Sepal.Length)]
 
 :::
 
+## Profiling
 
+* Identify (and hopefully fix!) bottlenecks in your code.
+* The [`profvis`](https://rstudio.github.io/profvis/) package is a good package to use for this purpose.
+
+## Profiling Example
+
+```{r prof}
+#| eval: true
+library(profvis)
+library(data.table)
+n <- 4e5
+cols <- 150
+data <- as.data.frame(x = matrix(rnorm(n * cols, mean = 5), ncol = cols))
+data <- cbind(id = paste0("g", seq_len(n)), data)
+dataDF <- as.data.table(data)
+numeric_vars <- setdiff(names(data), "id")
+
+profvis({
+  means <- apply(data[, names(data) != "id"], 2, mean)
+  means <- colMeans(data[, names(data) != "id"])
+  means <- lapply(data[, names(data) != "id"], mean)
+  means <- vapply(data[, names(data) != "id"], mean, numeric(1))
+  means <- matrixStats::colMeans2(as.matrix(data[, names(data) != "id"]))
+  means <- dataDF[, lapply(.SD, mean), .SDcols = numeric_vars]
+})
+```
 
 . . . 
 
