@@ -3,8 +3,6 @@ suppressPackageStartupMessages({
     library(ggplot)
 })
 
-iris
-
 ### Example 1
 
 formulae <- c(
@@ -55,3 +53,37 @@ cl <- makeCluster(num_cores)
 system.time(save3 <- parLapply(cl, 1:100, f))
 #    user  system elapsed 
 #   0.198   0.044   1.032 
+
+
+
+## Data. table code
+
+library(data.table)
+iris_dt <- as.data.table(iris)
+
+iris_dt[, mean(Sepal.Length), by=Species]
+iris_dt[Species == "setosa", mean(Sepal.Length)]
+iris_dt[, mean(Sepal.Length), by=Species]
+iris_dt[Sepal.Length>5, .N, by=Species]
+iris_dt[, .SD[1], by=Species]
+
+iris_dt[, Species_ita := paste0(
+    Species, 'ino'
+), by=Species]
+iris_dt[, unique(Species_ita)]
+
+iris_dt[, Species_ita := gsub(
+    "aino","ino",
+    Species_ita
+), by=Species_ita]
+iris_dt[, unique(Species_ita)]
+
+numeric_cols <- names(iris_dt)[sapply(iris_dt, is.numeric)]
+iris_dt[, lapply(
+    .SD, as.integer
+), .SDcols = numeric_cols] |> head(2)
+
+new_cols <- paste0(numeric_cols, "_int")
+iris_dt[, (new_cols) := lapply(
+    .SD, as.integer
+), .SDcols = numeric_cols]; head(iris_dt, n=2)
