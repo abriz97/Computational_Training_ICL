@@ -1,0 +1,226 @@
+[
+  {
+    "objectID": "making_R_fast.html#great-r-resources",
+    "href": "making_R_fast.html#great-r-resources",
+    "title": "Computational Training: running fastR",
+    "section": "Great R resources",
+    "text": "Great R resources\n\nIn general:\n\nAdvanced R\nR for Data Science\nRStudio Cheatsheets\nUseful R packages\n\nCovering this session’s topics\n\ndata.table\nparallel"
+  },
+  {
+    "objectID": "making_R_fast.html#what-is-fast-code",
+    "href": "making_R_fast.html#what-is-fast-code",
+    "title": "Computational Training: running fastR",
+    "section": "What is “fast code”?",
+    "text": "What is “fast code”?\n\n✏️ Easy to write\nfamiliarity with code editor, libraries\n💡 Easy to understand\nstructured, with consistent variable names, commented.\n🔧 Easy to debug\nclear naming, DRY, tests.\n🏎️ Easy to run\n(profiling, C++, using “optimized” code)."
+  },
+  {
+    "objectID": "making_R_fast.html#variable-naming",
+    "href": "making_R_fast.html#variable-naming",
+    "title": "Computational Training: running fastR",
+    "section": "Variable naming",
+    "text": "Variable naming\n\n\n\n\n\n\n\n\n\n\n\n\n\nnames should be consistent, descriptive, lower case, readable.\n\n\nFor which snippet is it easier to guess the context?\n\n\n\ntmp &lt;-  10\ntmp1 &lt;- tmp * 24\n\n\n\ncases_per_hour &lt;- 10\ncases_per_day &lt;- cases_per_hour * 24\n\n\n\n\nDealing with the 2nd hardest thing in computer science (Patil)"
+  },
+  {
+    "objectID": "making_R_fast.html#embrace-functional-programming-i",
+    "href": "making_R_fast.html#embrace-functional-programming-i",
+    "title": "Computational Training: running fastR",
+    "section": "Embrace functional programming I",
+    "text": "Embrace functional programming I\nFunctions are first-class citizens in R\n\n\n\ncan be passed as arguments\ncan be returned from other functions\ncan be assigned to variables\nand more…\n\n\n\n\n\nfirst-class-citizenship.R\n\nf &lt;- function(x){x^2}\n\nlapply(1:10, f)\n\ngenerator &lt;- function(n=2){\n    function(x){x^n}\n}\ncube &lt;- generator(3)\n\nlist(one_function = f)"
+  },
+  {
+    "objectID": "making_R_fast.html#embrace-functional-programming-ii",
+    "href": "making_R_fast.html#embrace-functional-programming-ii",
+    "title": "Computational Training: running fastR",
+    "section": "Embrace functional programming II",
+    "text": "Embrace functional programming II\nRethink for, while loops; “apply” instead\n\n\n“To become significantly more reliable, code must become more transparent. In particular, nested conditions and loops must be viewed with great suspicion. Complicated control flows confuse programmers. Messy code often hides bugs.”\n— Bjarne Stroustrup\n\n\nAdvanced R, Funtional Programming (Wickham)\n\n\n\n\n…but why?"
+  },
+  {
+    "objectID": "making_R_fast.html#section",
+    "href": "making_R_fast.html#section",
+    "title": "Computational Training: running fastR",
+    "section": "",
+    "text": "Say you want to extract the \\(R^2\\) from three linear models with different predictors (or formulae).\n\n\n\nformulae.R\n\nformulae &lt;- c(\n    Sepal.Length ~ Sepal.Width,\n    Sepal.Length ~ Petal.Length,\n    Sepal.Length ~ Species\n)\n\n\n\n\n\n\n\n\nbad way\n\nlm_results2 &lt;- c()\n\nfor (formula in formulae) {\n    fit &lt;- lm(formula, data = iris)\n    r2 &lt;- summary(fit)$r.squared\n    lm_results2 &lt;- c(lm_results2, r2)\n}\n\n\n\n\n\n\ngood way\n\nextract_r2 &lt;- function(formula) {\n    fit &lt;- lm(formula, data = iris)\n    r2 &lt;- summary(fit)$r.squared\n    return(r2)\n}\n\nlm_results &lt;- sapply(formulae, extract_r2)\n\n\n\n\n\n\n\nWhat’s the difference?\n\n\n\n\n\n\nside effects\n\nexists(\"fit\")\n\n\n\nAdvanced R, Functional Programming (Wickham)\n\n\n\nFor loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other."
+  },
+  {
+    "objectID": "making_R_fast.html#the-parallel-package",
+    "href": "making_R_fast.html#the-parallel-package",
+    "title": "Computational Training: running fastR",
+    "section": "The parallel package",
+    "text": "The parallel package\nYou can imagine wanting to run each of the apply/for loop iterations in parallel.\n\nespecially if iterations are independent and computationally expensive. Two quick sentences on the two different approaches.\n\n\n\n\n\n\nsockets (not on Windows)\n\nlibrary(parallel)\nf &lt;- function(i) {\n    lme4::lmer(\n        Petal.Width ~ . - Species + (1 | Species),\n        data = iris)\n}\n\nsystem.time(save1 &lt;- lapply(1:100, f))\n##    user  system elapsed\n##   2.048   0.019   2.084\nsystem.time(save2 &lt;- mclapply(1:100, f))\n##    user  system elapsed\n##   1.295   0.150   1.471\n\n\n\n\n\n\nforking\n\nnum_cores &lt;- detectCores()\ncl &lt;- makeCluster(num_cores)\nsystem.time(save3 &lt;- parLapply(cl, 1:100, f))\n#    user  system elapsed \n#   0.198   0.044   1.032 \nstopCluster(cl)\n\n\n\nrequires further attention\n\n\n\n\nParallel computing in R"
+  },
+  {
+    "objectID": "making_R_fast.html#introduction-to-data.table",
+    "href": "making_R_fast.html#introduction-to-data.table",
+    "title": "Computational Training: running fastR",
+    "section": "Introduction to data.table",
+    "text": "Introduction to data.table\n\ndata.table is a package that extends the data.frame class.\n(Quicker) alternative to dplyr for large datasets.\ncheatsheet"
+  },
+  {
+    "objectID": "making_R_fast.html#all-you-need-to-know",
+    "href": "making_R_fast.html#all-you-need-to-know",
+    "title": "Computational Training: running fastR",
+    "section": "all you need to know",
+    "text": "all you need to know\n\ndt[i, j, by]\n\n\nuse the data.table called dt …\nsubset it on the rows specified by i…\nand manipulate columns with j…\ngrouped according to by.\n\n\n\nlibrary(data.table)\niris_dt &lt;- as.data.table(iris)"
+  },
+  {
+    "objectID": "making_R_fast.html#iris-summaries",
+    "href": "making_R_fast.html#iris-summaries",
+    "title": "Computational Training: running fastR",
+    "section": "iris summaries",
+    "text": "iris summaries\nSubsetting and Summarizing\n\n\ndt[i, j, by]\n\n\n\n\n\nSay we want to calculate the mean sepal length for the setosa species…\n\n\n\niris_dt[Species == \"setosa\", mean(Sepal.Length)]\n\n[1] 5.006\n\n\n\n\nGrouping and Aggregating\n\n\ndt[i, j, by]\n\n\n\n\n\nNow we want to repeat the above for every species, in one command.\n\n\n\niris_dt[, mean(Sepal.Length), by=Species]\n\n      Species    V1\n1:     setosa 5.006\n2: versicolor 5.936\n3:  virginica 6.588"
+  },
+  {
+    "objectID": "making_R_fast.html#iris-summaries-.vars",
+    "href": "making_R_fast.html#iris-summaries-.vars",
+    "title": "Computational Training: running fastR",
+    "section": "iris summaries (.VARS)",
+    "text": "iris summaries (.VARS)\n\n\ndt[i, j, by]\n\n\nCounting entries (.N)\n\n\n\nCount the total number of observations per species, with sepal length &gt; 5.\n\n\n\niris_dt[Sepal.Length&gt;5, .N, by=Species]\n\n      Species  N\n1:     setosa 22\n2: versicolor 47\n3:  virginica 49\n\n\n\n\nPrint 1st entry of each group (.SD)\n\n\ndt[i, j, by]\n\n\n\n\n\nPrint the first entry of each group (species).\n\n\n\niris_dt[, .SD[1], by=Species]\n\n      Species Sepal.Length Sepal.Width Petal.Length Petal.Width\n1:     setosa          5.1         3.5          1.4         0.2\n2: versicolor          7.0         3.2          4.7         1.4\n3:  virginica          6.3         3.3          6.0         2.5\n\n\n\n?.I for documentation on data.table’s special symbols."
+  },
+  {
+    "objectID": "making_R_fast.html#modifying-the-dt-in-place",
+    "href": "making_R_fast.html#modifying-the-dt-in-place",
+    "title": "Computational Training: running fastR",
+    "section": "Modifying the dt (in place)",
+    "text": "Modifying the dt (in place)\n\n\ndt[i, j, by]\n\n\nYou will need a walrus (operator):\n\n\n\n:=\n\n\n\nused in  j \nname := vector to act on a single column.\n(names) := list of vectors to act on multiple columns."
+  },
+  {
+    "objectID": "making_R_fast.html#modifying-the-dt-in-place-1",
+    "href": "making_R_fast.html#modifying-the-dt-in-place-1",
+    "title": "Computational Training: running fastR",
+    "section": "Modifying the dt (in place)",
+    "text": "Modifying the dt (in place)\nDefine a new column\n\n\n\nSay you want species names to sound more Italian.\n\n\n\niris_dt[, Species_ita := paste0(\n    Species, 'ino'\n), by=Species]\niris_dt[, unique(Species_ita)]\n\n[1] \"setosaino\"     \"versicolorino\" \"virginicaino\" \n\n\n\n\nModify existing column\n\n\ndt[i, j, by]\n\n\n\n\n\nThe “aino” ending does not sound right, let’s remove the “a”.\n\n\n\niris_dt[, Species_ita := gsub(\n    \"aino\",\"ino\",\n    Species_ita\n), by=Species_ita]\niris_dt[, unique(Species_ita)]\n\n[1] \"setosino\"      \"versicolorino\" \"virginicino\""
+  },
+  {
+    "objectID": "making_R_fast.html#acting-on-multiple-columns",
+    "href": "making_R_fast.html#acting-on-multiple-columns",
+    "title": "Computational Training: running fastR",
+    "section": "Acting on multiple columns",
+    "text": "Acting on multiple columns\n\n\ndt[i, j, by]\n\n\nApply a function to multiple columns\n\n\n\nLet us round the numeric columns to integers…\n\n\n\nnumeric_cols &lt;- names(iris_dt)[sapply(iris_dt, is.numeric)]\niris_dt[, lapply(\n    .SD, as.integer\n), .SDcols = numeric_cols] |&gt; head(2)\n\n   Sepal.Length Sepal.Width Petal.Length Petal.Width\n1:            5           3            1           0\n2:            4           3            1           0\n\n\n\n\nDefine multiple columns at once\n\n\n\n… and store them in columns with the same name, but with a _int suffix.\n\n\n\nnew_cols &lt;- paste0(numeric_cols, \"_int\")\niris_dt[, (new_cols) := lapply(\n    .SD, as.integer\n), .SDcols = numeric_cols]; head(iris_dt, n=2)\n\n   Sepal.Length Sepal.Width Petal.Length Petal.Width Species Species_ita\n1:          5.1         3.5          1.4         0.2  setosa    setosino\n2:          4.9         3.0          1.4         0.2  setosa    setosino\n   Sepal.Length_int Sepal.Width_int Petal.Length_int Petal.Width_int\n1:                5               3                1               0\n2:                4               3                1               0"
+  },
+  {
+    "objectID": "making_R_fast.html#summary-and-advanced-topics",
+    "href": "making_R_fast.html#summary-and-advanced-topics",
+    "title": "Computational Training: running fastR",
+    "section": "Summary and advanced topics",
+    "text": "Summary and advanced topics\n\n\ndata.table is a powerful package for data manipulation.\nquick to write and quick to run BUT not the easiest to read.\n\nAdvanced topics:\n\nDefinitely print out a cheatsheet if you want to start using it.\ndata.table function reference for additional wrangling utilities.\nVignettes for more advanced topics."
+  },
+  {
+    "objectID": "making_R_fast.html#profiling",
+    "href": "making_R_fast.html#profiling",
+    "title": "Computational Training: running fastR",
+    "section": "Profiling",
+    "text": "Profiling\n\nIdentify (and hopefully fix!) bottlenecks in your code.\nThe profvis package is a good package to use for this purpose."
+  },
+  {
+    "objectID": "making_R_fast.html#profiling-example-column-means",
+    "href": "making_R_fast.html#profiling-example-column-means",
+    "title": "Computational Training: running fastR",
+    "section": "Profiling Example: Column Means",
+    "text": "Profiling Example: Column Means\n\nlibrary(profvis)\nlibrary(data.table)\nn &lt;- 4e5\ncols &lt;- 150\ndata &lt;- as.data.frame(x = matrix(rnorm(n * cols, mean = 5), ncol = cols))\ndata &lt;- cbind(id = paste0(\"g\", seq_len(n)), data)\ndataDF &lt;- as.data.table(data)\nnumeric_vars &lt;- setdiff(names(data), \"id\")\n\nprofvis({\n  means &lt;- apply(data[, names(data) != \"id\"], 2, mean)\n  means &lt;- colMeans(data[, names(data) != \"id\"])\n  means &lt;- lapply(data[, names(data) != \"id\"], mean)\n  means &lt;- vapply(data[, names(data) != \"id\"], mean, numeric(1))\n  means &lt;- matrixStats::colMeans2(as.matrix(data[, names(data) != \"id\"]))\n  means &lt;- dataDF[, lapply(.SD, mean), .SDcols = numeric_vars]\n})"
+  },
+  {
+    "objectID": "making_R_fast.html#profiling-example-column-means-output",
+    "href": "making_R_fast.html#profiling-example-column-means-output",
+    "title": "Computational Training: running fastR",
+    "section": "Profiling Example: Column Means",
+    "text": "Profiling Example: Column Means"
+  },
+  {
+    "objectID": "making_R_fast.html#good-coding-practice-reproducibility-generalisability",
+    "href": "making_R_fast.html#good-coding-practice-reproducibility-generalisability",
+    "title": "Computational Training: running fastR",
+    "section": "Good coding practice: Reproducibility & Generalisability",
+    "text": "Good coding practice: Reproducibility & Generalisability\nWhy are code reproducibility & generalisability important?\n\n✅ Transparency & Verification\n🤝 Collaboration & Longevity\n🔍 Quicker detection of errors"
+  },
+  {
+    "objectID": "making_R_fast.html#reproducibility",
+    "href": "making_R_fast.html#reproducibility",
+    "title": "Computational Training: running fastR",
+    "section": "Reproducibility",
+    "text": "Reproducibility\n\nMain idea: Be able to reproduce results to ensure they are valid.\nCommon practices:\n\nSetting the seed\nImporting all necessary packages\nDocumenting R environment (sessionInfo())\n\n\n\n\n\n\n\nbad way\n\nx &lt;- rnorm(1)\ndtruncnorm(x, -5, 5, 0, 1)\n\n\n\n\n\n\nstill bad...\n\nset.seed(1234)\nx &lt;- rnorm(1)\ndtruncnorm(x, -5, 5, 0, 1)\n\n\n\n\n\n\nthere we go!\n\nlibrary(truncnorm)\nset.seed(1234)\nx &lt;- rnorm(1)\ndtruncnorm(x, -5, 5, 0, 1)"
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability",
+    "href": "making_R_fast.html#generalisability",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability",
+    "text": "Generalisability\n\nCode should be “generalisable” meaning that anyone else can refer to it and use it on their own data.\nCommon practices:\n\n⚙️ Write functions for operations you use frequently\n💬 Document your code (add comments)\n❓ Add basic checks (testing)\n✔️❌ Test your code on different data sets"
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability-example",
+    "href": "making_R_fast.html#generalisability-example",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability: Example",
+    "text": "Generalisability: Example\n\nTask: Create a function kmeans_recip that does the following:\n\nTakes a data set as input.\nComputes reciprocals of variables (i.e. for each value \\(x\\) it computes \\(1/x\\)).\nPerforms K-Means clustering (function kmeans) on the resulting data set.\nReturns the cluster assignment for the first 20 observations.\n\nThis function will be used on the iris data set (with K=3 clusters)."
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability-bad-example",
+    "href": "making_R_fast.html#generalisability-bad-example",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability: Bad example",
+    "text": "Generalisability: Bad example\n\n\n\n\ndon't even bother...\n\nkmeans_recip &lt;- function(){\n  for (i in c(1:4)){\n    iris[, i] &lt;- 1/iris[, i]\n  }\n  kmeans_res &lt;- kmeans(iris[, c(1:4)], centers = 3)\n  return(kmeans_res$cluster)\n}\nkmeans_recip()[1:20]\n\n\n [1] 2 2 2 2 2 1 1 2 2 2 2 2 2 2 2 1 1 1 1 1"
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability-ok-example",
+    "href": "making_R_fast.html#generalisability-ok-example",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability: OK example",
+    "text": "Generalisability: OK example\n\nThe previous example works but it’s really not generalisable…\nObvious things that need improvement:\n\nHardcoded values (first 4 columns are numeric in iris)\nData set should be an input argument\n\n\n\n\n\n\nit's getting better\n\nkmeans_recip &lt;- function(data, cont_cols){\n  for (i in cont_cols){\n    data[, i] &lt;- 1/data[, i]\n  }\n  kmeans_res &lt;- kmeans(data[, cont_cols], centers = 3)\n  return(kmeans_res$cluster)\n}\nkmeans_recip(data = iris, cont_cols = c(1:4))[1:20]\n\n\n [1] 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 1 1 1 1 1"
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability-good-example",
+    "href": "making_R_fast.html#generalisability-good-example",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability: Good example",
+    "text": "Generalisability: Good example\n\nWe can still do better! More things to consider:\n\nDivision by 0 is not allowed\nDetermine numerical variables automatically\nEnsure there exists at least one continuous variable\nAdd some comments\n\n\n\n\n\n\nthat's looking good\n\nkmeans_recip &lt;- function(data){\n  # Obtain numerical variables\n  cont_cols &lt;- which(sapply(data, is.numeric))\n  # Check there is at least 1 numerical variable\n  if (length(cont_cols)==0) stop('No numerical variables!')\n  for (i in cont_cols){\n    # Check if numerical variable takes 0 value\n    ifelse(any(data[, i] == 0),\n           stop('Division by 0 not allowed!'),\n           data[, i] &lt;- 1/data[, i])\n  }\n  # Apply K-Means clustering\n  kmeans_res &lt;- kmeans(data[, cont_cols], centers = 3)\n  return(kmeans_res$cluster)\n}\nkmeans_recip(data = iris)[1:20]\n\n\n [1] 1 1 1 1 1 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3"
+  },
+  {
+    "objectID": "making_R_fast.html#generalisability-can-we-generalise",
+    "href": "making_R_fast.html#generalisability-can-we-generalise",
+    "title": "Computational Training: running fastR",
+    "section": "Generalisability: Can we generalise?",
+    "text": "Generalisability: Can we generalise?\n\nNow we can also check if this works on the diamonds data set from the ggplot2 package.\n\n\n\n\n\nseems like it works!\n\nlibrary(ggplot2)\nkmeans_recip(data = diamonds)[1:20]\n\n\nError in ifelse(any(data[, i] == 0), stop(\"Division by 0 not allowed!\"), : Division by 0 not allowed!"
+  },
+  {
+    "objectID": "making_R_fast.html#debugging",
+    "href": "making_R_fast.html#debugging",
+    "title": "Computational Training: running fastR",
+    "section": "Debugging",
+    "text": "Debugging\n\n🐛 Debugging is the process of finding and fixing errors in your code.\n🤬 Generally annoying but can be made much easier with a few simple steps!"
+  },
+  {
+    "objectID": "making_R_fast.html#debugging-made-easy",
+    "href": "making_R_fast.html#debugging-made-easy",
+    "title": "Computational Training: running fastR",
+    "section": "Debugging made easy",
+    "text": "Debugging made easy\n\nCommon practices to debug your code more easily include:\n\n📖 Read error messages carefully\n🖨️ Use print messages (cat(), print(), message() etc.)\n💾 Save objects that may be causing the error (to be able to reproduce it)\n📑 A bit more “advanced” options are traceback(), browser(), debug() (more details here)\n💻 Don’t forget: Google, Stack Overflow, ChatGPT etc. are your friends"
+  },
+  {
+    "objectID": "making_R_fast.html#error-handling",
+    "href": "making_R_fast.html#error-handling",
+    "title": "Computational Training: running fastR",
+    "section": "Error Handling",
+    "text": "Error Handling\n\n😰 Sometimes errors cannot be avoided…\n🎉 Good news is we can handle them!\n💊 Error handling is the process of responding to and recovering from error conditions."
+  },
+  {
+    "objectID": "making_R_fast.html#error-handling-the-trycatch-syntax",
+    "href": "making_R_fast.html#error-handling-the-trycatch-syntax",
+    "title": "Computational Training: running fastR",
+    "section": "Error Handling: the tryCatch() syntax",
+    "text": "Error Handling: the tryCatch() syntax\n\ntryCatch() is the function to use for error handling in R.\n\n\n\n\n\nbasic tryCatch syntax\n\nresult &lt;- tryCatch({\n  expr\n  },\n  warning = function(w){\n    warning-handler-code\n    },\n  error = function(e){\n    error-handler-code\n    },\n  finally = {\n    cleanup-code\n  }\n)"
+  },
+  {
+    "objectID": "making_R_fast.html#error-handling-basic-example",
+    "href": "making_R_fast.html#error-handling-basic-example",
+    "title": "Computational Training: running fastR",
+    "section": "Error Handling: basic example",
+    "text": "Error Handling: basic example\n\n\n\n\ntryCatch example\n\nsafe_log &lt;- function(x){\n  result &lt;- tryCatch({\n    log(x) # Attempt to calculate the logarithm\n  },\n  warning = function(w){\n    message(\"A warning occurred: \", w) # Handle warnings\n    NULL # Return NULL if a warning occurs\n  },\n  error = function(e){\n    message(\"An error occurred: \", e) # Handle the error\n    NA  # Return NA if an error occurs\n  },\n  finally = {\n    # This block executes no matter what\n    message(\"Logarithm attempt completed.\")\n  })\n  return(result)\n}"
+  },
+  {
+    "objectID": "making_R_fast.html#error-handling-basic-example-1",
+    "href": "making_R_fast.html#error-handling-basic-example-1",
+    "title": "Computational Training: running fastR",
+    "section": "Error Handling: basic example",
+    "text": "Error Handling: basic example\n\n\n\n\ntryCatch works!\n\nprint(safe_log(2024))\n\n\nLogarithm attempt completed.\n\n\n[1] 7.612831\n\nprint(safe_log(-8))\n\nA warning occurred: simpleWarning in log(x): NaNs produced\n\nLogarithm attempt completed.\n\n\nNULL\n\nprint(safe_log(\"zero\"))\n\nAn error occurred: Error in log(x): non-numeric argument to mathematical function\n\nLogarithm attempt completed.\n\n\n[1] NA\n\n\n\n\n{background-iframe=“hello-matrix/index.html”} let us add this with the hex of data.table at the end.\n\n\n\nCode and slides"
+  }
+]
