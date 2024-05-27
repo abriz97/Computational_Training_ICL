@@ -45,7 +45,8 @@ load_city_airbnb_data <- function(path){
         guest_satisfaction_overall >= 90
     ]
     airbnb_prices[, room_type:=as.factor(room_type)]
-    airbnb_prices[, cleanliness_rating:=as.factor(cleanliness_rating)]
+    # Fix 1: Conversion to factor messes up operations later...
+    # airbnb_prices[, cleanliness_rating:=as.factor(cleanliness_rating)]
     
 
     return(airbnb_prices)
@@ -77,7 +78,8 @@ plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
                    (food_costs + attraction_costs + (cleanliness_rating - 8) * cleanliness_costs) * n_days ]
     costs[, cost_per_day := total_cost / n_days ]
     
-    airbnb_lm <- lm(costs ~ room_type + cleanliness_rating + host_is_superhost + city +
+    # Fix 2: Target variable should be total_cost, not costs
+    airbnb_lm <- lm(total_cost ~ room_type + cleanliness_rating + host_is_superhost + city +
                       guest_satisfaction_overall, data = costs)
     summary_lm <- summary(airbnb_lm)
     p_vals <- summary_lm$coefficients[, 4]

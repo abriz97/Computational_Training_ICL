@@ -101,7 +101,7 @@ if (all(dim(airbnb_topcity)==c(60, 9)) & sum(complete.cases(airbnb_topcity)) == 
   + Given a data table of listings, it computes the total cost of a trip for a given number of days (`n_days`).
   + Computes the expected cost per day.
   + Fits a linear model predicting the total costs given the type of room, the cleanliness rating, whether the host is a superhost, the city and the overall guest satisfaction.
-  + Print the p-values for the estimated linear model coefficients.
+  + Prints the p-values for the estimated linear model coefficients.
   + Produces a "map" of the listings coloured by their average daily price.
 
 ```{r plot_with_prices, echo = FALSE}
