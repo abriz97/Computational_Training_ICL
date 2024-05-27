@@ -11,6 +11,7 @@ format:
       data-background-image: "../figures/IMPERIAL_I_Maze_RGB.svg"
       data-background-size: 15%
       data-background-position: 50% 98%
+      auto-animate-unmatched: false
     preload-iframes: true
     embed-resources: true
     default-fig-align: "center"
@@ -29,5 +30,6 @@ format:
     code-line-numbers: false
 
 execute:
+    freeze: auto
     echo: true
     eval: false

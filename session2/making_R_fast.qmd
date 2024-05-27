@@ -245,9 +245,9 @@ stopCluster(cl)
 -   (Quicker) alternative to `dplyr` for large datasets.
 -   [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf)
 
-## all you need to know
+## all you need to know {auto-animate=true auto-animate-easing="ease-in-out"}
 
-::: {style="text-align: center; font-size: 100px;"}
+::: {data-id="dt" auto-animate-delay="0" style="text-align: center; font-size: 100px;"}
 dt\[[i]{style="color:blue;"}, [j]{style="color:red;"}, [by]{style="color:green;"}\]
 :::
 
@@ -264,12 +264,12 @@ library(data.table)
 iris_dt <- as.data.table(iris)
 ```
 
-## `iris` summaries
+## `iris` summaries {auto-animate=true auto-animate-easing="ease-in-out"} 
 
-#### Subsetting and Summarizing
+#### Subsetting and Summarizing 
 
 ::: top-right
-::: {style="text-align: center;"}
+::: {data-id="dt" auto-animate-delay="0" style="text-align: center;"}
 dt\[[i]{style="color:blue;"}, [j]{style="color:red;"}, [by]{style="color:green;"}\]
 :::
 :::
@@ -363,6 +363,35 @@ iris_dt[, .SD[1], by=Species]
 dt\[[i]{style="color:blue;"}, [j]{style="color:red;"}, [by]{style="color:green;"}\]
 :::
 :::
+
+You will need a walrus (operator):
+
+::: {.columns}
+
+::: {.column width="50%" }
+
+::: {style="text-align: center; font-size: 100px;"}
+`:=` 
+:::
+
+::: {.nonincremental .smaller .fragment}
+- used in <span style="color:red;"> j </span> 
+- `name := vector` to act on a single column.
+- `(names) := list of vectors` to act on multiple columns.
+:::
+
+:::
+
+::: {.column width="50%"}
+![](../figures/walrus.jpeg){height="300" fig-align="center"}
+:::
+
+:::
+
+
+
+## Modifying the `dt` (in place)
+
 
 #### Define a new column
 
