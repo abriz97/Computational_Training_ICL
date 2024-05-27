@@ -188,6 +188,275 @@ exists("fit")
 -   For loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other.
 :::
 
+## Good coding practice: Reproducibility & Generalisability
+
+Why are code reproducibility & generalisability important?
+
+-   ✅ Transparency & Verification
+-   🤝 Collaboration & Longevity
+-   🔍 Quicker detection of errors
+
+## Reproducibility
+
+-   Main idea: Be able to reproduce results to ensure they are valid.
+-   Common practices:
+    -   Setting the seed
+    -   Importing all necessary packages
+    -   Documenting R environment ([`sessionInfo()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/sessionInfo))
+
+::: columns
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "bad way"
+#| error: false
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
+:::
+
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "still bad..."
+#| error: false
+set.seed(1234)
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
+:::
+
+::: {.column .fragment width="33%"}
+```{r}
+#| filename: "there we go!"
+library(truncnorm)
+set.seed(1234)
+x <- rnorm(1)
+dtruncnorm(x, -5, 5, 0, 1)
+```
+:::
+:::
+
+## Generalisability
+
+-   Code should be "generalisable" meaning that anyone else can refer to it and use it on their own data.
+-   Common practices:
+    -   ⚙️ Write functions for operations you use frequently
+    -   💬 Document your code (add comments)
+    -   ❓ Add basic checks (testing)
+    -   ✔️❌ Test your code on different data sets
+
+## Generalisability: Example {.smaller}
+
+-   **Task:** Create a function `kmeans_recip` that does the following:
+    -   Takes a data set as input.
+    -   Computes reciprocals of variables (i.e. for each value $x$ it computes $1/x$).
+    -   Performs K-Means clustering (function `kmeans`) on the resulting data set.
+    -   Returns the cluster assignment for the first 20 observations.
+-   This function will be used on the `iris` data set (with K=3 clusters).
+
+## Generalisability: Bad example
+
+::: fragment
+```{r badex_gen}
+#| filename: "don't even bother..."
+#| eval: true
+#| error: false
+kmeans_recip <- function(){
+  for (i in c(1:4)){
+    iris[, i] <- 1/iris[, i]
+  }
+  kmeans_res <- kmeans(iris[, c(1:4)], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip()[1:20]
+```
+:::
+
+## Generalisability: OK example
+
+-   The previous example works but it's really not generalisable...
+-   Obvious things that need improvement:
+    -   Hardcoded values (first 4 columns are numeric in `iris`)
+    -   Data set should be an input argument
+
+::: fragment
+```{r okex_gen}
+#| filename: "it's getting better"
+#| eval: true
+#| error: false
+kmeans_recip <- function(data, cont_cols){
+  for (i in cont_cols){
+    data[, i] <- 1/data[, i]
+  }
+  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip(data = iris, cont_cols = c(1:4))[1:20]
+```
+:::
+
+## Generalisability: Good example {.smaller}
+
+-   We can still do better! More things to consider:
+    -   Division by 0 is not allowed
+    -   Determine numerical variables automatically
+    -   Ensure there exists at least one continuous variable
+    -   Add some comments
+
+::: fragment
+```{r goodex_gen}
+#| filename: "that's looking good"
+#| eval: true
+#| error: false
+kmeans_recip <- function(data){
+  # Obtain numerical variables
+  cont_cols <- which(sapply(data, is.numeric))
+  # Check there is at least 1 numerical variable
+  if (length(cont_cols)==0) stop('No numerical variables!')
+  for (i in cont_cols){
+    # Check if numerical variable takes 0 value
+    ifelse(any(data[, i] == 0),
+           stop('Division by 0 not allowed!'),
+           data[, i] <- 1/data[, i])
+  }
+  # Apply K-Means clustering
+  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
+  return(kmeans_res$cluster)
+}
+kmeans_recip(data = iris)[1:20]
+```
+:::
+
+## Generalisability: Can we generalise?
+
+-   Now we can also check if this works on the `diamonds` data set from the `ggplot2` package.
+
+::: fragment
+```{r diamonds}
+#| filename: "seems like it works!"
+#| eval: true
+#| error: true
+library(ggplot2)
+kmeans_recip(data = diamonds)[1:20]
+```
+:::
+
+## Debugging
+
+-   🐛 Debugging is the process of finding and fixing errors in your code.
+-   🤬 Generally annoying but can be made much easier with a few simple steps!
+
+![](../figures/debugging.png){.fragment height="300" fig-align="center"}
+
+## Debugging made easy
+
+-   Common practices to debug your code more easily include:
+    -   📖 Read error messages carefully
+    -   🖨️ Use print messages (`cat()`, `print()`, `message()` etc.)
+    -   💾 Save objects that may be causing the error (to be able to reproduce it)
+    -   📑 A bit more "advanced" options are `traceback()`, `browser()`, `debug()` [(more details here)](https://adv-r.hadley.nz/debugging.html)
+    -   💻 [Don't forget:]{.underline} Google, Stack Overflow, ChatGPT etc. are your friends
+    
+## Using breakpoints for debugging
+
+- Breakpoints are markers you can set in your code for execution to stop.
+
+::: fragment
+```{r breakpoints}
+#| filename: "incorrect function"
+#| eval: true
+#| error: true
+calculate_sum <- function(x){
+  total <- 0
+  n <- length(x)
+  for (i in 1:n) {
+    total <- total + x[[i]]
+  }
+  return(total)
+}
+
+result <- calculate_sum(list(c(1), c(2), c(3), c('4')))
+
+```
+:::
+
+
+## Error Handling
+
+-   😰 Sometimes errors cannot be avoided...
+-   🎉 Good news is we can handle them!
+-   💊 Error handling is the process of responding to and recovering from error conditions.
+
+![](../figures/errorhandling.webp){.fragment height="300" fig-align="center"}
+
+## Error Handling: the `tryCatch()` syntax
+
+-   [`tryCatch()`](https://www.r-bloggers.com/2020/10/basic-error-handing-in-r-with-trycatch/) is the function to use for error handling in R.
+
+::: fragment
+```{r trycatch_syntax}
+#| filename: "basic tryCatch syntax"
+#| eval: false
+result <- tryCatch({
+  expr
+  },
+  warning = function(w){
+    warning-handler-code
+    },
+  error = function(e){
+    error-handler-code
+    },
+  finally = {
+    cleanup-code
+  }
+)
+```
+:::
+
+## Error Handling: basic example
+
+::: fragment
+```{r tryCatch_ex}
+#| filename: "tryCatch example"
+#| eval: true
+safe_log <- function(x){
+  result <- tryCatch({
+    log(x) # Attempt to calculate the logarithm
+  },
+  warning = function(w){
+    message("A warning occurred: ", w) # Handle warnings
+    NULL # Return NULL if a warning occurs
+  },
+  error = function(e){
+    message("An error occurred: ", e) # Handle the error
+    NA  # Return NA if an error occurs
+  },
+  finally = {
+    # This block executes no matter what
+    message("Logarithm attempt completed.")
+  })
+  return(result)
+}
+
+```
+:::
+
+## Error Handling: basic example
+
+::: fragment
+```{r tryCatch_res}
+#| filename: "tryCatch works!"
+#| eval: true
+#| echo: true
+#| warning: true
+#| error: true
+ex_list <- list(c(-8), c("zero"), c(2024))
+for (i in 1:length(ex_list)){
+  print(safe_log(ex_list[[i]]))
+}
+
+```
+:::
+
 ## The `parallel` package
 
 You can imagine wanting to run each of the apply/for loop iterations in `parallel`.
@@ -528,251 +797,6 @@ profvis({
   means <- dataDF[, lapply(.SD, mean), .SDcols = numeric_vars]
 })
 ```
-
-## Good coding practice: Reproducibility & Generalisability
-
-Why are code reproducibility & generalisability important?
-
--   ✅ Transparency & Verification
--   🤝 Collaboration & Longevity
--   🔍 Quicker detection of errors
-
-## Reproducibility
-
--   Main idea: Be able to reproduce results to ensure they are valid.
--   Common practices:
-    -   Setting the seed
-    -   Importing all necessary packages
-    -   Documenting R environment ([`sessionInfo()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/sessionInfo))
-
-::: columns
-::: {.column .fragment width="33%"}
-```{r}
-#| filename: "bad way"
-#| error: false
-x <- rnorm(1)
-dtruncnorm(x, -5, 5, 0, 1)
-```
-:::
-
-::: {.column .fragment width="33%"}
-```{r}
-#| filename: "still bad..."
-#| error: false
-set.seed(1234)
-x <- rnorm(1)
-dtruncnorm(x, -5, 5, 0, 1)
-```
-:::
-
-::: {.column .fragment width="33%"}
-```{r}
-#| filename: "there we go!"
-library(truncnorm)
-set.seed(1234)
-x <- rnorm(1)
-dtruncnorm(x, -5, 5, 0, 1)
-```
-:::
-:::
-
-## Generalisability
-
--   Code should be "generalisable" meaning that anyone else can refer to it and use it on their own data.
--   Common practices:
-    -   ⚙️ Write functions for operations you use frequently
-    -   💬 Document your code (add comments)
-    -   ❓ Add basic checks (testing)
-    -   ✔️❌ Test your code on different data sets
-
-## Generalisability: Example {.smaller}
-
--   **Task:** Create a function `kmeans_recip` that does the following:
-    -   Takes a data set as input.
-    -   Computes reciprocals of variables (i.e. for each value $x$ it computes $1/x$).
-    -   Performs K-Means clustering (function `kmeans`) on the resulting data set.
-    -   Returns the cluster assignment for the first 20 observations.
--   This function will be used on the `iris` data set (with K=3 clusters).
-
-## Generalisability: Bad example
-
-::: fragment
-```{r badex_gen}
-#| filename: "don't even bother..."
-#| eval: true
-#| error: false
-kmeans_recip <- function(){
-  for (i in c(1:4)){
-    iris[, i] <- 1/iris[, i]
-  }
-  kmeans_res <- kmeans(iris[, c(1:4)], centers = 3)
-  return(kmeans_res$cluster)
-}
-kmeans_recip()[1:20]
-```
-:::
-
-## Generalisability: OK example
-
--   The previous example works but it's really not generalisable...
--   Obvious things that need improvement:
-    -   Hardcoded values (first 4 columns are numeric in `iris`)
-    -   Data set should be an input argument
-
-::: fragment
-```{r okex_gen}
-#| filename: "it's getting better"
-#| eval: true
-#| error: false
-kmeans_recip <- function(data, cont_cols){
-  for (i in cont_cols){
-    data[, i] <- 1/data[, i]
-  }
-  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
-  return(kmeans_res$cluster)
-}
-kmeans_recip(data = iris, cont_cols = c(1:4))[1:20]
-```
-:::
-
-## Generalisability: Good example {.smaller}
-
--   We can still do better! More things to consider:
-    -   Division by 0 is not allowed
-    -   Determine numerical variables automatically
-    -   Ensure there exists at least one continuous variable
-    -   Add some comments
-
-::: fragment
-```{r goodex_gen}
-#| filename: "that's looking good"
-#| eval: true
-#| error: false
-kmeans_recip <- function(data){
-  # Obtain numerical variables
-  cont_cols <- which(sapply(data, is.numeric))
-  # Check there is at least 1 numerical variable
-  if (length(cont_cols)==0) stop('No numerical variables!')
-  for (i in cont_cols){
-    # Check if numerical variable takes 0 value
-    ifelse(any(data[, i] == 0),
-           stop('Division by 0 not allowed!'),
-           data[, i] <- 1/data[, i])
-  }
-  # Apply K-Means clustering
-  kmeans_res <- kmeans(data[, cont_cols], centers = 3)
-  return(kmeans_res$cluster)
-}
-kmeans_recip(data = iris)[1:20]
-```
-:::
-
-## Generalisability: Can we generalise?
-
--   Now we can also check if this works on the `diamonds` data set from the `ggplot2` package.
-
-::: fragment
-```{r diamonds}
-#| filename: "seems like it works!"
-#| eval: true
-#| error: true
-library(ggplot2)
-kmeans_recip(data = diamonds)[1:20]
-```
-:::
-
-## Debugging
-
--   🐛 Debugging is the process of finding and fixing errors in your code.
--   🤬 Generally annoying but can be made much easier with a few simple steps!
-
-![](../figures/debugging.png){.fragment height="300" fig-align="center"}
-
-## Debugging made easy
-
--   Common practices to debug your code more easily include:
-    -   📖 Read error messages carefully
-    -   🖨️ Use print messages (`cat()`, `print()`, `message()` etc.)
-    -   💾 Save objects that may be causing the error (to be able to reproduce it)
-    -   📑 A bit more "advanced" options are `traceback()`, `browser()`, `debug()` [(more details here)](https://adv-r.hadley.nz/debugging.html)
-    -   💻 [Don't forget:]{.underline} Google, Stack Overflow, ChatGPT etc. are your friends
-
-## Error Handling
-
--   😰 Sometimes errors cannot be avoided...
--   🎉 Good news is we can handle them!
--   💊 Error handling is the process of responding to and recovering from error conditions.
-
-![](../figures/errorhandling.webp){.fragment height="300" fig-align="center"}
-
-## Error Handling: the `tryCatch()` syntax
-
--   [`tryCatch()`](https://www.r-bloggers.com/2020/10/basic-error-handing-in-r-with-trycatch/) is the function to use for error handling in R.
-
-::: fragment
-```{r trycatch_syntax}
-#| filename: "basic tryCatch syntax"
-#| eval: false
-result <- tryCatch({
-  expr
-  },
-  warning = function(w){
-    warning-handler-code
-    },
-  error = function(e){
-    error-handler-code
-    },
-  finally = {
-    cleanup-code
-  }
-)
-```
-:::
-
-## Error Handling: basic example
-
-::: fragment
-```{r tryCatch_ex}
-#| filename: "tryCatch example"
-#| eval: true
-safe_log <- function(x){
-  result <- tryCatch({
-    log(x) # Attempt to calculate the logarithm
-  },
-  warning = function(w){
-    message("A warning occurred: ", w) # Handle warnings
-    NULL # Return NULL if a warning occurs
-  },
-  error = function(e){
-    message("An error occurred: ", e) # Handle the error
-    NA  # Return NA if an error occurs
-  },
-  finally = {
-    # This block executes no matter what
-    message("Logarithm attempt completed.")
-  })
-  return(result)
-}
-
-```
-:::
-
-## Error Handling: basic example
-
-::: fragment
-```{r tryCatch_res}
-#| filename: "tryCatch works!"
-#| eval: true
-#| echo: true
-#| warning: true
-#| error: true
-ex_list <- list(c(-8), c("zero"), c(2024))
-for (i in 1:length(ex_list)){
-  print(safe_log(ex_list[[i]]))
-}
-
-```
-:::
 
 ::: notes
 {background-iframe="hello-matrix/index.html"} let us add this with the hex of data.table at the end.

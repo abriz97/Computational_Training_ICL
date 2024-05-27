@@ -52,6 +52,8 @@ load_city_airbnb_data <- function(path){
         person_capacity >= 3 &
         guest_satisfaction_overall >= 90
     ]
+    airbnb_prices[, cleanliness_rating:=as.factor(cleanliness_rating)]
+    
 
     return(airbnb_prices)
 }
@@ -71,13 +73,20 @@ expected_costs <- data.table(
     flight_costs = c(50L, 150L, 100L),
     food_costs = c(50.5, 150L, 100L),
     attraction_costs = c(70L, 50L, 70L),
+    cleanliness_costs = c(5L, 4L, 2L),
     total_cost = NA_integer_
 )
+
+# Debug following
+# Additional cost for cleaning fees if cleanliness rating > 8
+# Change function without changing factor type in original data
+# Using as.numeric() messes things up - use as.numeric(as.character(...))
 
 plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
 
     airbnb_costs <- merge(airbnb, expected_costs, by="city")
-    airbnb_costs[, total_cost := realSum + flight_costs + (food_costs + attraction_costs) * n_days ]
+    airbnb_costs[, total_cost := realSum + flight_costs +
+                   (food_costs + attraction_costs + (cleanliness_rating - 8) * cleanliness_costs) * n_days ]
     airbnb_costs[, cost_per_day := total_cost / n_days ]
 
     # subtite <- f(n_days)
@@ -88,7 +97,7 @@ plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
         x="Longitude",
         y="Latitude",
         color = "Cost per day",
-        title="Cheapest 20 AirBNB per city",
+        title="Cheapest 20 Airbnb per city",
         shape="City",
         subtitle = sprintf("For %s days stay", n_days)
     ) 
