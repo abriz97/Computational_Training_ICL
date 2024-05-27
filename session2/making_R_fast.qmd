@@ -766,9 +766,10 @@ safe_log <- function(x){
 #| echo: true
 #| warning: true
 #| error: true
-print(safe_log(2024))
-print(safe_log(-8))
-print(safe_log("zero"))
+ex_list <- list(c(-8), c("zero"), c(2024))
+for (i in 1:length(ex_list)){
+  print(safe_log(ex_list[[i]]))
+}
 
 ```
 :::
