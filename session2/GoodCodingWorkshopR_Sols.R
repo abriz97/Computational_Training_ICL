@@ -5,15 +5,6 @@ library(here)
 repo_path <- here()
 data_dir <- file.path(repo_path, "session2/data")
 
-# Say you and your 2 best friends want to go away for a weekend to either ..., ..., or ...
-# You want to go to the cheapest AirBNB which satisfies some constraints:
-# - host is a super host
-# - 3 people
-# - cleanliness rating is at least 8.
-# - guest satisfaction 0 to 100, at least 90
-# - keep 2 extra columns still to determine
-# For each city, extract 20 cheapest accomodations satistyinf criteria
-
 # Load the data
 
 # Subset the data to only some columns
@@ -35,6 +26,7 @@ load_city_airbnb_data <- function(path){
 
     selected_cols <- c(
         "realSum",
+        "room_type",
         "cleanliness_rating",
         "person_capacity",
         "host_is_superhost",
@@ -52,6 +44,7 @@ load_city_airbnb_data <- function(path){
         person_capacity >= 3 &
         guest_satisfaction_overall >= 90
     ]
+    airbnb_prices[, room_type:=as.factor(room_type)]
     airbnb_prices[, cleanliness_rating:=as.factor(cleanliness_rating)]
     
 
@@ -77,20 +70,20 @@ expected_costs <- data.table(
     total_cost = NA_integer_
 )
 
-# Debug following
-# Additional cost for cleaning fees if cleanliness rating > 8
-# Change function without changing factor type in original data
-# Using as.numeric() messes things up - use as.numeric(as.character(...))
-
 plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
 
-    airbnb_costs <- merge(airbnb, expected_costs, by="city")
-    airbnb_costs[, total_cost := realSum + flight_costs +
+    costs <- merge(airbnb, expected_costs, by="city")
+    costs[, total_cost := realSum + flight_costs +
                    (food_costs + attraction_costs + (cleanliness_rating - 8) * cleanliness_costs) * n_days ]
-    airbnb_costs[, cost_per_day := total_cost / n_days ]
-
-    # subtite <- f(n_days)
-    p <- ggplot(airbnb_costs, aes(x=lng, y=lat, color=cost_per_day, shape=city)) + 
+    costs[, cost_per_day := total_cost / n_days ]
+    
+    airbnb_lm <- lm(costs ~ room_type + cleanliness_rating + host_is_superhost + city +
+                      guest_satisfaction_overall, data = costs)
+    summary_lm <- summary(airbnb_lm)
+    p_vals <- summary_lm$coefficients[, 4]
+    print(p_vals)
+    
+    p <- ggplot(costs, aes(x=lng, y=lat, color=cost_per_day, shape=city)) + 
     geom_point() +
     theme_bw() + 
     labs(
@@ -105,7 +98,3 @@ plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
 }
 
 p <- plot_with_prices(airbnb_topcity, expected_costs, 3)
-p <- plot_with_prices(airbnb_topcity, expected_costs, 0)
-p <- plot_with_prices(airbnb_topcity, expected_costs)
-
-lapply(c(0,3,5,7,14), plot_with_prices, airbnb=airbnb_topcity, expected_costs=expected_costs)
