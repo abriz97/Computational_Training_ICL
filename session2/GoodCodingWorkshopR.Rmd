@@ -1,6 +1,6 @@
 ---
 title: "GoodCodingWorkshopR"
-author: "Efthymios Costa"
+author: "Andrea Brizzi & Efthymios Costa"
 date: "2024-05-28"
 output: html_document
 ---
