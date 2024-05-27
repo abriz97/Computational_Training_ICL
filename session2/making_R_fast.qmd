@@ -33,12 +33,33 @@ Covering this session's topics
 4.  🏎️ **Easy to run**\
     (profiling, C++, using "optimized" code).
 
+
+# Good coding practices
+
 ## Variable naming
+
+::: {.columns}
+
+::: {.column width="70%"}
 
 ::: r-stack
 ![](../figures/MagrittePipe.jpg){.fragment height="250" fig-align="center"}
 
 ![](../figures/catcat.png){.fragment height="250" fig-align="center"}
+:::
+
+:::
+
+::: {.column width="30%"}
+```{r}
+#| label: catcatcat
+#| warning: false
+cat("cat")
+cat <- "cat"
+cat(cat)
+```
+:::
+
 :::
 
 . . .
@@ -188,7 +209,7 @@ exists("fit")
 -   For loops may still be prefered (or the only choice), when the order of execution is important, and different runs may affect each other.
 :::
 
-## Good coding practice: Reproducibility & Generalisability
+## Reproducibility & Generalisability
 
 Why are code reproducibility & generalisability important?
 
@@ -457,13 +478,32 @@ for (i in 1:length(ex_list)){
 ```
 :::
 
+# Code optimization  
+
+## Throwback to {l,s}apply
+
+We previously showed how you can avoid side effects through by letting functions be the protagonists of your code.
+
+```{r }
+#| warning: false
+extract_r2 <- function(formula) {
+    fit <- lm(formula, data = iris)
+    r2 <- summary(fit)$r.squared
+    return(r2)
+}
+
+lm_results <- sapply(formulae, extract_r2)
+```
+
+. . .
+
+What if each iteration in the loop is computationally expensive?
+
+
 ## The `parallel` package
 
 You can imagine wanting to run each of the apply/for loop iterations in `parallel`.
 
-::: notes
-especially if iterations are independent and computationally expensive. Two quick sentences on the two different approaches.
-:::
 
 ::: columns
 ::: {.column .fragment width="50%"}
@@ -505,8 +545,44 @@ stopCluster(cl)
 :::
 
 ::: footer
-[Parallel computing in R](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package)
+[Parallel computing in R](https://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html#the-parallel-package) & [setup script](https://github.com/abriz97/Computational_Training_ICL/blob/main/session2/fastR_extra/local_cores_parallelisation.R)
 :::
+
+
+## The `Rcpp` package {.smaller}
+
+As ChatGPT exists, it is now easier to write custom C++ functions to speed up your code.
+
+* Always test the output!
+
+```{r }
+#| label: gaussian_likelihood
+#| warning: false
+
+Rcpp::cppFunction("
+double standard_normal_log_likelihood(NumericVector data) {
+  int n = data.size();
+  double log_likelihood = -0.5 * n * log(2 * M_PI);
+  for (int i = 0; i < n; i++) {
+    log_likelihood -= 0.5 * data[i] * data[i];
+  }
+  return log_likelihood;
+}
+")
+
+x <- rnorm(10000000)
+system.time(standard_normal_log_likelihood(x))
+#    user  system elapsed 
+#   0.021   0.000   0.022 
+system.time(sum(log(dnorm(x))))
+#    user  system elapsed 
+#   0.284   0.016   0.300 
+```
+
+::: footer
+[Introduction to `rcpp`](https://adv-r.hadley.nz/rcpp.html#rcpp-package)
+:::
+
 
 ## Introduction to [data.table](https://rdatatable.gitlab.io/data.table/)
 
@@ -757,6 +833,9 @@ iris_dt[, (new_cols) := lapply(
 -   `data.table` is a powerful package for data manipulation.
 -   quick to write and quick to run BUT not the easiest to read.
 
+
+. . .
+
 Advanced topics:
 
 -   Definitely print out a [cheatsheet](https://rstudio.github.io/cheatsheets/datatable.pdf) if you want to start using it.
@@ -798,6 +877,9 @@ profvis({
 })
 ```
 
-::: notes
-{background-iframe="hello-matrix/index.html"} let us add this with the hex of data.table at the end.
-:::
+
+## Packages for all your needs
+
+- [CRAN Task Views](https://cran.r-project.org/web/views/) summarizes which packages are used in different fields of statistics.
+- [Collection of useful R packages](https://indrajeetpatil.github.io/awesome-r-pkgtools/)
+- [Concise fast R snippets](https://github.com/nanxstats/r-base-shortcuts?tab=readme-ov-file#use-i-to-include-objects-as-is-in-data-frames)

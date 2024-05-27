@@ -2,9 +2,10 @@ project:
   type: website
 
 title: "Computational Training: running fastR"
-author: "Andrea Brizzi and Efhtymios Costa"
+author: "Andrea Brizzi and Efthymios Costa"
 date: 2024-05-28
 
+preload-iframes: true
 format:
   revealjs:
     title-slide-attributes:
@@ -12,7 +13,6 @@ format:
       data-background-size: 15%
       data-background-position: 50% 98%
       auto-animate-unmatched: false
-    preload-iframes: true
     embed-resources: true
     default-fig-align: "center"
     slide-number: true

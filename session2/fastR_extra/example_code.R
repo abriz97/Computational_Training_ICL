@@ -87,3 +87,26 @@ new_cols <- paste0(numeric_cols, "_int")
 iris_dt[, (new_cols) := lapply(
     .SD, as.integer
 ), .SDcols = numeric_cols]; head(iris_dt, n=2)
+
+
+## RCPP
+
+
+library(Rcpp)
+
+cppFunction('
+double standard_normal_log_likelihood(NumericVector data) {
+  int n = data.size();
+  double log_likelihood = -0.5 * n * log(2 * M_PI);
+  
+  for (int i = 0; i < n; i++) {
+    log_likelihood -= 0.5 * data[i] * data[i];
+  }
+  
+  return log_likelihood;
+}
+')
+
+x <- rnorm(10000000)
+system.time(standard_normal_log_likelihood(x))
+system.time(sum(log(dnorm(x))))
