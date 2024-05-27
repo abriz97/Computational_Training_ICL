@@ -1,0 +1,151 @@
+---
+title: "GoodCodingWorkshopR"
+author: "Efthymios Costa"
+date: "2024-05-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Airbnb Prices in European cities
+
+In this workshop, you will be working with data of Airbnb listing prices for 3 European cities; Amsterdam, Athens and Barcelona. You and your friends want to travel to one of these cities and would like to see which one is the best option for a short trip of a few days. Use the code below to extract the directory where the datasets are saved.
+
+```{r datapaths}
+require(data.table)
+require(ggplot2)
+require(here)
+
+repo_path <- here()
+data_dir <- file.path(repo_path, "session2/data")
+
+# Locate the data directory and extract path
+data_paths <- file.path(
+    repo_path, 
+    "session2/data",
+    c(
+        "amsterdam_weekends.csv",
+        "athens_weekends.csv",
+        "barcelona_weekends.csv"
+    )
+)
+```
+
+- The `load_city_airbnb_data` function below is used for preprocessing the data. Complete the indicated section so that the function returns listings that satisfy the following criteria:
+  + The host is a superhost.
+  + Cleanliness rating at least equal to 8.
+  + Can accommodate at least 3 guests.
+  + Overall guest satisfaction of at least 90.
+- Convert `room_type` and `cleanliness_rating` variables to factor type.
+- The function should return the preprocessed dataset.
+
+```{r preprocessing}
+# Subset the data to only some columns
+load_city_airbnb_data <- function(path){
+
+    extract_city <- function(path){
+        strsplit(basename(path), "_")[[1]][1]
+    }
+
+    selected_cols <- c(
+        "realSum",
+        "room_type",
+        "cleanliness_rating",
+        "person_capacity",
+        "host_is_superhost",
+        "guest_satisfaction_overall",
+        "lng",
+        "lat"
+    )
+
+    # Read the data and select columns
+    airbnb_prices <- fread(path, select=selected_cols)
+    airbnb_prices[ , city := extract_city(path)]
+    
+    ###################################
+    ######### COMPLETE HERE! ##########
+    ###################################
+
+    return(airbnb_prices)
+}
+
+airbnb_all <- lapply(data_paths, load_city_airbnb_data) |>
+    rbindlist()
+```
+
+- For each city, choose the 20 least expensive listings and store them in a data.frame `airbnb_topcity`.
+
+```{r topcity, echo=FALSE}
+
+n_accomodation_per_city <- 20
+setkey(airbnb_all, city, realSum)
+
+# Complete here!
+# airbnb_topcity <- ...
+```
+
+- If everything has gone well, `airbnb_topcity` should include 60 rows, 9 columns and no `NA` values. Use the following function to check everything is correct.
+
+```{r check, echo = FALSE}
+if (all(dim(airbnb_topcity)==c(60, 9)) & sum(complete.cases(airbnb_topcity)) == 60){
+  print('All good!')
+} else {
+  print('Check your code again...')
+}
+```
+
+- You now wish to estimate the full amount you will spend for your trip. The `expected_costs` data table includes average costs for flights, food, visiting attractions and daily cleaning fees (applicable when `cleanliness_rating` is at least 8) for each city.
+- The `plot_with_prices` function is meant to be used for the following:
+  + Given a data table of listings, it computes the total cost of a trip for a given number of days (`n_days`).
+  + Computes the expected cost per day.
+  + Fits a linear model predicting the total costs given the type of room, the cleanliness rating, whether the host is a superhost, the city and the overall guest satisfaction.
+  + Print the p-values for the estimated linear model coefficients.
+  + Produces a "map" of the listings coloured by their average daily price.
+
+```{r plot_with_prices, echo = FALSE}
+expected_costs <- data.table(
+    city = c("amsterdam", "athens", "barcelona"),
+    flight_costs = c(50L, 150L, 100L),
+    food_costs = c(50.5, 150L, 100L),
+    attraction_costs = c(70L, 50L, 70L),
+    cleanliness_costs = c(5L, 4L, 2L),
+    total_cost = NA_integer_
+)
+
+plot_with_prices <- function(airbnb, expected_costs=expected_costs, n_days=3){
+
+    costs <- merge(airbnb, expected_costs, by="city")
+    costs[, total_cost := realSum + flight_costs +
+                   (food_costs + attraction_costs + (cleanliness_rating - 8) * cleanliness_costs) * n_days ]
+    costs[, cost_per_day := total_cost / n_days ]
+    
+    airbnb_lm <- lm(costs ~ room_type + cleanliness_rating + host_is_superhost + city +
+                      guest_satisfaction_overall, data = costs)
+    summary_lm <- summary(airbnb_lm)
+    p_vals <- summary_lm$coefficients[, 4]
+    print(p_vals)
+    
+    p <- ggplot(costs, aes(x=lng, y=lat, color=cost_per_day, shape=city)) + 
+    geom_point() +
+    theme_bw() + 
+    labs(
+        x="Longitude",
+        y="Latitude",
+        color = "Cost per day",
+        title="Cheapest 20 Airbnb per city",
+        shape="City",
+        subtitle = sprintf("For %s days stay", n_days)
+    ) 
+    return(p)
+}
+```
+
+- Test whether the `plot_with_prices` function works as it should. If not, locate any bugs and fix them.
+
+```{r debugging, echo = FALSE}
+
+p <- plot_with_prices(airbnb_topcity, expected_costs, 3)
+p
+```
