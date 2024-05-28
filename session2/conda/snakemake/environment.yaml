@@ -1,0 +1,13 @@
+name: snakemake_clinic
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snakemake-minimal >=8.4.4
+  - jinja2
+  - matplotlib
+  - graphviz
+  - bcftools =1.19
+  - samtools =1.19.2
+  - bwa =0.7.17
+  - pygments

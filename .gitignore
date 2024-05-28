@@ -1,2 +1,10 @@
+*.pyc
+.snakemake
+calls
+mapped_reads
+sorted_reads
+pyproject.toml
 
+__pycache__
+*.egg-info
 session2/making_R_fast.html
