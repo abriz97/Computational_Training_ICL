@@ -18,7 +18,12 @@
             height: 32
           },
           {
-            src: "Python.png",
+            src: "datatablelogo.png",
+            width: 32,
+            height: 32
+          },
+          {
+            src: "rcpplogo.png",
             width: 320,
             height: 320
           }
