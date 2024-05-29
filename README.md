@@ -14,7 +14,7 @@ The topics are structured as follows:
 |                          |                        | [Workshop](https://github.com/bmartin9/MScComputingIntro)                                                                 |
 | [Session 2](./session2/) | May 28, 10:00 to 17:00 | [Conda](./session2/conda/Dependency%20management.pdf) + [workshop](./session2/conda)                               |
 |                          |                        | [Overleaf](./session2/Overleaf_notes.pdf)                                                                                 |
-|                          |                        | Reproducibility                                                                                                           |
+|                          |                        | [Reproducibility](./session2/MSc_Computing_Reproducibility_Presentation.pdf)                                                                                                            |
 |                          |                        | Code Optimisation, profiling and extra resources for [R](./session2/_site/making_R_fast.html) and [python](./session2/fast_python/python_optimisation.pdf) |
 | | | Workshop in [`R`](./session2/GoodCodingWorkshopR.Rmd) and [`python`](./session2/MScOptimisation/) |
 
