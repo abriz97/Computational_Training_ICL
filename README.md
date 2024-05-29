@@ -12,11 +12,8 @@ The topics are structured as follows:
 |                          |                        | How to structure your [`R`](./session1/r_repo_structure.md) and [`python`](./session1/MSc_Computing_Presentation-2.pdf) project directory                          |
 |                          |                        | [git & github](./session1/intro_to_git.pptx)                                                                              |
 |                          |                        | [Workshop](https://github.com/bmartin9/MScComputingIntro)                                                                 |
-| [Session 2](./session2/) | May 28, 14:00 to 17:00 | [Conda](./session2/conda/Dependency%20management.pdf) + [workshop](./session2/conda)                               |
+| [Session 2](./session2/) | May 28, 10:00 to 17:00 | [Conda](./session2/conda/Dependency%20management.pdf) + [workshop](./session2/conda)                               |
 |                          |                        | [Overleaf](./session2/Overleaf_notes.pdf)                                                                                 |
 |                          |                        | Reproducibility                                                                                                           |
-|                          |                        | Code Optimisation and profiling for [R](./making_R_fast.qmd) and [python](./session2/fast_python/python_optimisation.pdf) |
-|                          |                        | Package Suggestions & useful resources                                                                                    |
-|                          |                        | Workshop in [`R`](./session2/GoodCodingWorkshopR.Rmd) and [`python`](./session2/MScOptimisation/)                         |
-
-
+|                          |                        | Code Optimisation, profiling and extra resources for [R](./making_R_fast.html) and [python](./session2/fast_python/python_optimisation.pdf) |
+|                          |                        | Workshop in [`R`](./session2/GoodCodingWorkshopR.Rmd) and [`python`](./session2/MScOptimisation/)   
