@@ -7,4 +7,4 @@ pyproject.toml
 
 __pycache__
 *.egg-info
-session2/making_R_fast.html
+# session2/making_R_fast.html
