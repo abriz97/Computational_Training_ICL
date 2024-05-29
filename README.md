@@ -16,4 +16,5 @@ The topics are structured as follows:
 |                          |                        | [Overleaf](./session2/Overleaf_notes.pdf)                                                                                 |
 |                          |                        | Reproducibility                                                                                                           |
 |                          |                        | Code Optimisation, profiling and extra resources for [R](./session2/_site/making_R_fast.html) and [python](./session2/fast_python/python_optimisation.pdf) |
+| | | Workshop in [`R`](./session2/GoodCodingWorkshopR.Rmd) and [`python`](./session2/MScOptimisation/) |
 
